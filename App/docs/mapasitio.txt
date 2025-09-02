@@ -1,0 +1,55 @@
+ProyectoAutonomiaPersonal/
+│
+├─ public/                     # Carpeta pública (lo que ve el navegador)
+│  ├─ index.php                # Front controller / router principal
+│  ├─ home_landing.php         # Tu landing (HTML con Tailwind)
+│  ├─ assets/                  # Recursos estáticos
+│  │  ├─ css/
+│  │  │  └─ main.css           # Estilos propios
+│  │  ├─ js/
+│  │  │  └─ main.js            # JS propio
+│  │  └─ img/                  # Imágenes, íconos, logos
+│  └─ .htaccess                # (opcional) URLs limpias / redirecciones
+│
+├─ app/                        # Lógica PHP (mini-MVC)
+│  ├─ controllers/             # Controladores
+│  │  ├─ HomeController.php
+│  │  ├─ AuthController.php    # login, registro, logout
+│  │  ├─ FoodsController.php   # CRUD de alimentos
+│  │  └─ DiaryController.php   # Diario de ingestas
+│  ├─ models/                  # Modelos (conexión con la BD)
+│  │  ├─ User.php              # Modelo usuarios
+│  │  ├─ Food.php              # Modelo alimentos
+│  │  └─ Diary.php             # Modelo diario
+│  ├─ views/                   # Vistas parciales y plantillas
+│  │  ├─ layouts/
+│  │  │  └─ base.php           # Layout común (head, header, footer)
+│  │  ├─ partials/
+│  │  │  ├─ header.php
+│  │  │  └─ footer.php
+│  │  ├─ auth/
+│  │  │  ├─ login.php
+│  │  │  └─ register.php
+│  │  ├─ home.php
+│  │  ├─ nutricion.php
+│  │  └─ deporte.php
+│  └─ helpers.php              # Funciones útiles
+│
+├─ inc/                        # Configuración del sistema
+│  ├─ config.example.php       # Plantilla de credenciales (para subir a GitHub)
+│  ├─ config.php               # Credenciales reales (IGNORADO en git)
+│  └─ db.php                   # Conexión MySQL/MariaDB
+│
+├─ database/                   # Archivos de base de datos
+│  ├─ schema.sql               # Estructura de tablas (users, foods, diary…)
+│  └─ seed.sql                 # Datos iniciales (ej. alimentos base)
+│
+├─ docs/                       # Documentación para tu proyecto social
+│  ├─ 01_SRS_Requerimientos.md
+│  ├─ 02_Arquitectura.md
+│  ├─ 03_Diseño_UI_Prototipos.md
+│  ├─ 04_Plan_Pruebas.md
+│  ├─ 05_Cronograma_Avances.md
+│  └─ 06_Despliegue.md
+│
+└─ README.md                   # Explicación general del proyecto
