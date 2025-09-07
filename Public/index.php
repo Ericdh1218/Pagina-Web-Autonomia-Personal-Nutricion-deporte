@@ -12,6 +12,12 @@ switch ($r) {
     vista(__DIR__ . '/../App/views/inicio.php', ['BASE' => $BASE]);
     break;
 
+  case 'deporte':
+    require_login($BASE);
+    vista(__DIR__ . '/../App/views/deporte.php', ['BASE' => $BASE]);
+    break;
+
+
   case 'login':
     vista(__DIR__ . '/../App/views/auth/login.php', ['BASE' => $BASE]);
     break;
@@ -20,21 +26,25 @@ switch ($r) {
     require_once __DIR__ . '/../App/models/UsuariosModelo.php';
 
     $correo = trim($_POST['correo'] ?? '');
-    $pass   = $_POST['password'] ?? '';
+    $pass = $_POST['password'] ?? '';
+    $next = $_POST['next'] ?? ($BASE . 'index.php?r=inicio'); // recupera el "next"
 
     $user = Usuario::buscarPorCorreo($mysqli, $correo);
 
     if (!$user || !password_verify($pass, $user['password_hash'])) {
       flash('error', 'Credenciales inválidas.');
-      header('Location: ' . $BASE . 'index.php?r=login'); exit;
+      header('Location: ' . $BASE . 'index.php?r=login&next=' . urlencode($next));
+      exit;
     }
 
-    $_SESSION['user_id']   = $user['id'];
+    $_SESSION['user_id'] = $user['id'];
     $_SESSION['user_name'] = $user['nombre'];
-    $_SESSION['is_admin']  = $user['is_admin'];
+    $_SESSION['is_admin'] = $user['is_admin'];
 
-    header('Location: ' . $BASE . 'index.php?r=inicio'); exit;
-    break;
+    // vuelve a donde quería ir, o al inicio
+    header('Location: ' . $next);
+    exit;
+
 
   case 'registro':
     vista(__DIR__ . '/../App/views/auth/registro.php', ['BASE' => $BASE]);
@@ -45,27 +55,31 @@ switch ($r) {
 
     $nombre = trim($_POST['nombre'] ?? '');
     $correo = trim($_POST['correo'] ?? '');
-    $pass   = $_POST['password'] ?? '';
-    $pass2  = $_POST['password2'] ?? '';
+    $pass = $_POST['password'] ?? '';
+    $pass2 = $_POST['password2'] ?? '';
 
     if ($nombre === '' || !filter_var($correo, FILTER_VALIDATE_EMAIL) || strlen($pass) < 6 || $pass !== $pass2) {
       flash('error', 'Datos inválidos.');
-      header('Location: ' . $BASE . 'index.php?r=registro'); exit;
+      header('Location: ' . $BASE . 'index.php?r=registro');
+      exit;
     }
 
     if (Usuario::buscarPorCorreo($mysqli, $correo)) {
       flash('error', 'El correo ya está registrado.');
-      header('Location: ' . $BASE . 'index.php?r=registro'); exit;
+      header('Location: ' . $BASE . 'index.php?r=registro');
+      exit;
     }
 
     Usuario::crear($mysqli, $nombre, $correo, $pass);
     flash('ok', 'Cuenta creada. Ahora inicia sesión.');
-    header('Location: ' . $BASE . 'index.php?r=login'); exit;
+    header('Location: ' . $BASE . 'index.php?r=login');
+    exit;
     break;
 
   case 'logout':
     session_destroy();
-    header('Location: ' . $BASE . 'index.php?r=inicio'); exit;
+    header('Location: ' . $BASE . 'index.php?r=inicio');
+    exit;
     break;
 
   default:

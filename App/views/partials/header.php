@@ -11,9 +11,18 @@
     <!-- Menú navegación -->
     <div class="hidden md:flex space-x-6">
       <a href="<?= $BASE ?>index.php?r=inicio" class="hover:text-blue-200">Inicio</a>
-      <a href="<?= $BASE ?>index.php?r=nutricion" class="hover:text-blue-200">Nutrición</a>
-      <a href="<?= $BASE ?>index.php?r=deporte" class="hover:text-blue-200">Deporte</a>
-      <a href="<?= $BASE ?>index.php?r=herramientas" class="hover:text-blue-200">Herramientas</a>
+
+      <?php if (!empty($_SESSION['user_id'])): ?>
+        <!-- Usuario logueado: links normales -->
+        <a href="<?= $BASE ?>index.php?r=nutricion" class="hover:text-blue-200">Nutrición</a>
+        <a href="<?= $BASE ?>index.php?r=deporte" class="hover:text-blue-200">Deporte</a>
+        <a href="<?= $BASE ?>index.php?r=herramientas" class="hover:text-blue-200">Herramientas</a>
+      <?php else: ?>
+        <!-- Usuario NO logueado: links redirigen a login con next -->
+        <a href="<?= $BASE ?>index.php?r=login&next=<?= urlencode($BASE . 'index.php?r=nutricion') ?>" class="hover:text-blue-200">Nutrición</a>
+        <a href="<?= $BASE ?>index.php?r=login&next=<?= urlencode($BASE . 'index.php?r=deporte') ?>" class="hover:text-blue-200">Deporte</a>
+        <a href="<?= $BASE ?>index.php?r=login&next=<?= urlencode($BASE . 'index.php?r=herramientas') ?>" class="hover:text-blue-200">Herramientas</a>
+      <?php endif; ?>
     </div>
 
     <!-- Auth -->
