@@ -8,6 +8,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- OJO: paths absolutos desde /Public como raíz -->
   <link rel="stylesheet" href="/ProyectoAutonomiaPersonal/Public/assets/css/main.css">
+  <link rel="stylesheet" href="<?= $BASE ?>assets/css/main.css">
+<script src="<?= $BASE ?>assets/js/main.js"></script>
+
 </head>
 <body class="bg-gray-50">
   <?php if(file_exists(__DIR__.'/../partials/header.php')) require __DIR__.'/../partials/header.php'; ?>

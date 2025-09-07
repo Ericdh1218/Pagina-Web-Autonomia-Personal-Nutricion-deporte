@@ -1,19 +1,17 @@
 <?php
 class Usuario {
-  public static function buscarPorCorreo(mysqli $mysqli, string $correo): ?array {
-    $sql  = "SELECT id, nombre, correo, password_hash, tipo_user FROM users WHERE correo=? LIMIT 1";
-    $stmt = $mysqli->prepare($sql);
-    $stmt->bind_param("s", $correo);
+  public static function buscarPorCorreo(mysqli $db, string $correo): ?array {
+    $stmt = $db->prepare('SELECT * FROM users WHERE correo = ? LIMIT 1');
+    $stmt->bind_param('s', $correo);
     $stmt->execute();
-    $res = $stmt->get_result()->fetch_assoc();
-    return $res ?: null;
+    $res = $stmt->get_result();
+    return $res->fetch_assoc() ?: null;
   }
 
-  public static function crear(mysqli $mysqli, string $nombre, string $correo, string $password): bool {
-    $hash = password_hash($password, PASSWORD_DEFAULT);
-    $sql  = "INSERT INTO users (nombre, correo, password_hash) VALUES (?, ?, ?)";
-    $stmt = $mysqli->prepare($sql);
-    $stmt->bind_param("sss", $nombre, $correo, $hash);
+  public static function crear(mysqli $db, string $nombre, string $correo, string $pass): bool {
+    $hash = password_hash($pass, PASSWORD_DEFAULT);
+    $stmt = $db->prepare('INSERT INTO users (nombre, correo, password_hash) VALUES (?, ?, ?)');
+    $stmt->bind_param('sss', $nombre, $correo, $hash);
     return $stmt->execute();
   }
 }

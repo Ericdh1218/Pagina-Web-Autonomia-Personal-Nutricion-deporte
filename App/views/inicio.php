@@ -215,7 +215,7 @@
       </div>
 
       <!-- Beneficios (deporte y alimentación) -->
-      <!-- … (tu mismo contenido, sin cambios de lógica) … -->
+
 
       <!-- Consejos rápidos -->
       <div class="bg-white p-8 rounded-2xl shadow-lg">
