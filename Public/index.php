@@ -17,6 +17,15 @@ switch ($r) {
     vista(__DIR__ . '/../App/views/deporte.php', ['BASE' => $BASE]);
     break;
 
+  case 'nutricion':
+    require_login($BASE);
+    vista(__DIR__ . '/../App/views/nutricion.php', ['BASE' => $BASE]);
+    break;
+
+  case 'herramientas':
+    require_login($BASE);
+    vista(__DIR__ . '/../App/views/herramientas.php', ['BASE' => $BASE]);
+    break; 
 
   case 'login':
     vista(__DIR__ . '/../App/views/auth/login.php', ['BASE' => $BASE]);
@@ -74,13 +83,12 @@ switch ($r) {
     flash('ok', 'Cuenta creada. Ahora inicia sesión.');
     header('Location: ' . $BASE . 'index.php?r=login');
     exit;
-    break;
 
   case 'logout':
     session_destroy();
     header('Location: ' . $BASE . 'index.php?r=inicio');
     exit;
-    break;
+
 
   default:
     http_response_code(404);
