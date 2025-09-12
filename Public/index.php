@@ -18,9 +18,24 @@ switch ($r) {
     break;
 
   case 'nutricion':
-    require_login($BASE);
-    vista(__DIR__ . '/../App/views/nutricion.php', ['BASE' => $BASE]);
-    break;
+  require_once __DIR__ . '/../App/models/ComidasModelo.php';
+  $comidas = ComidasModelo::obtenerPorUsuario($mysqli, $_SESSION['user_id']);
+  vista(__DIR__ . '/../App/views/nutricion.php', [
+    'BASE' => $BASE,
+    'comidas' => $comidas
+  ]);
+  break;
+
+
+case 'comida_agregar':
+  require_once __DIR__ . '/../App/controllers/ComidasControlador.php';
+  ComidasControlador::agregar($mysqli);
+  break;
+
+case 'comida_eliminar':
+  require_once __DIR__ . '/../App/controllers/ComidasControlador.php';
+  ComidasControlador::eliminar($mysqli);
+  break;
 
   case 'herramientas':
     require_login($BASE);
