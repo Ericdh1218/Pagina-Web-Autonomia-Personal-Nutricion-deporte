@@ -68,18 +68,23 @@
     <section>
         <h2 class="text-xl font-semibold text-gray-800 mb-4">📚 Biblioteca de conocimiento</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div
-                class="bg-gradient-to-r from-purple-400 to-indigo-500 text-white rounded-xl shadow p-6 hover:shadow-lg cursor-pointer">
+
+            <div class="bg-gradient-to-r from-purple-400 to-indigo-500 ... cursor-pointer"
+                onclick="window.location='<?= $BASE ?>index.php?r=recetario'">
                 <h3 class="font-bold text-lg mb-2">Recetario inteligente</h3>
                 <p class="text-sm opacity-90">Filtra por tiempo, ingredientes o tipo de dieta.</p>
             </div>
-            <div
-                class="bg-gradient-to-r from-green-400 to-emerald-500 text-white rounded-xl shadow p-6 hover:shadow-lg cursor-pointer">
+
+
+            <a href="<?= $BASE ?>index.php?r=guias"
+                class="bg-gradient-to-r from-green-400 to-emerald-500 text-white rounded-xl shadow p-6 hover:shadow-lg block">
                 <h3 class="font-bold text-lg mb-2">Guías de nutrición</h3>
                 <p class="text-sm opacity-90">Aprende a leer etiquetas y a entender los macros.</p>
-            </div>
+            </a>
+
         </div>
     </section>
+
 
 </div>
 

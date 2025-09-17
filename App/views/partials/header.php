@@ -17,6 +17,8 @@
         <a href="<?= $BASE ?>index.php?r=nutricion" class="hover:text-blue-200">Nutrición</a>
         <a href="<?= $BASE ?>index.php?r=deporte" class="hover:text-blue-200">Deporte</a>
         <a href="<?= $BASE ?>index.php?r=herramientas" class="hover:text-blue-200">Herramientas</a>
+        <a href="<?= $BASE ?>index.php?r=Micuenta" class="hover:text-blue-200">Micuenta</a>
+        
       <?php else: ?>
         <!-- Usuario NO logueado: links redirigen a login con next -->
         <a href="<?= $BASE ?>index.php?r=login&next=<?= urlencode($BASE . 'index.php?r=nutricion') ?>" class="hover:text-blue-200">Nutrición</a>

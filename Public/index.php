@@ -18,29 +18,62 @@ switch ($r) {
     break;
 
   case 'nutricion':
-  require_once __DIR__ . '/../App/models/ComidasModelo.php';
-  $comidas = ComidasModelo::obtenerPorUsuario($mysqli, $_SESSION['user_id']);
-  vista(__DIR__ . '/../App/views/nutricion.php', [
+    // si no hay usuario logueado, mándalo a login con un aviso
+    if (empty($_SESSION['user_id'])) {
+      flash('error', 'Debes iniciar sesión o registrarte para acceder a esta sección.');
+      header('Location: ' . $BASE . 'index.php?r=login');
+      exit;
+    }
+
+    require_once __DIR__ . '/../App/models/ComidasModelo.php';
+    $comidas = ComidasModelo::obtenerPorUsuario($mysqli, $_SESSION['user_id']);
+    vista(__DIR__ . '/../App/views/nutricion.php', [
+      'BASE' => $BASE,
+      'comidas' => $comidas
+    ]);
+    break;
+
+
+  case 'comida_agregar':
+    require_once __DIR__ . '/../App/controllers/ComidasControlador.php';
+    ComidasControlador::agregar($mysqli);
+    break;
+
+  case 'comida_eliminar':
+    require_once __DIR__ . '/../App/controllers/ComidasControlador.php';
+    ComidasControlador::eliminar($mysqli);
+    break;
+
+ case 'recetario':
+  require_once __DIR__ . '/../App/controllers/RecetasControlador.php';
+  $q = $_GET['q'] ?? null;
+  $recetas = RecetasControlador::index($mysqli, $q);
+  vista(__DIR__ . '/../App/views/recetario.php', [
     'BASE' => $BASE,
-    'comidas' => $comidas
+    'recetas' => $recetas
+  ]);
+  break;
+
+case 'receta':
+  require_once __DIR__ . '/../App/controllers/RecetasControlador.php';
+  $id = $_GET['id'] ?? 0;
+  $receta = RecetasControlador::detalle($mysqli, $id);
+  vista(__DIR__ . '/../App/views/receta.php', [
+    'BASE' => $BASE,
+    'receta' => $receta
   ]);
   break;
 
 
-case 'comida_agregar':
-  require_once __DIR__ . '/../App/controllers/ComidasControlador.php';
-  ComidasControlador::agregar($mysqli);
-  break;
 
-case 'comida_eliminar':
-  require_once __DIR__ . '/../App/controllers/ComidasControlador.php';
-  ComidasControlador::eliminar($mysqli);
-  break;
+  case 'guias':
+    vista(__DIR__ . '/../App/views/guias.php', ['BASE' => $BASE]);
+    break;
 
   case 'herramientas':
     require_login($BASE);
     vista(__DIR__ . '/../App/views/herramientas.php', ['BASE' => $BASE]);
-    break; 
+    break;
 
   case 'login':
     vista(__DIR__ . '/../App/views/auth/login.php', ['BASE' => $BASE]);
