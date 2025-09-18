@@ -18,3 +18,14 @@ CREATE TABLE comidas (
    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
  );
+ 
+ CREATE TABLE recetas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(255) NOT NULL,
+    descripcion TEXT NOT NULL,
+    ingredientes TEXT NOT NULL,
+    instrucciones TEXT NOT NULL,
+    imagen VARCHAR(255) NOT NULL,
+    categoria VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
