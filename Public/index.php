@@ -9,17 +9,17 @@ $r = $_GET['r'] ?? 'inicio';
 
 switch ($r) {
   case 'inicio':
-  $objetivosCount = $mysqli->query("SELECT COUNT(*) AS total FROM objetivos")->fetch_assoc()['total'];
-  $ejerciciosCount = $mysqli->query("SELECT COUNT(*) AS total FROM ejercicios")->fetch_assoc()['total'];
-  $recetasCount = $mysqli->query("SELECT COUNT(*) AS total FROM recetas")->fetch_assoc()['total'];
+    $objetivosCount = $mysqli->query("SELECT COUNT(*) AS total FROM objetivos")->fetch_assoc()['total'];
+    $ejerciciosCount = $mysqli->query("SELECT COUNT(*) AS total FROM ejercicios")->fetch_assoc()['total'];
+    $recetasCount = $mysqli->query("SELECT COUNT(*) AS total FROM recetas")->fetch_assoc()['total'];
 
-  vista(__DIR__ . '/../App/views/inicio.php', [
-    'BASE' => $BASE,
-    'objetivosCount' => $objetivosCount,
-    'ejerciciosCount' => $ejerciciosCount,
-    'recetasCount'   => $recetasCount
-  ]);
-  break;
+    vista(__DIR__ . '/../App/views/inicio.php', [
+      'BASE' => $BASE,
+      'objetivosCount' => $objetivosCount,
+      'ejerciciosCount' => $ejerciciosCount,
+      'recetasCount' => $recetasCount
+    ]);
+    break;
 
   case 'objetivos':
     // Obtenemos todos los objetivos de la base de datos
@@ -30,7 +30,7 @@ switch ($r) {
       'objetivos' => $objetivos
     ]);
     break;
-  
+
   case 'ejercicios':
     // Obtenemos todos los ejercicios de la base de datos
     $ejercicios = $mysqli->query("SELECT * FROM ejercicios ORDER BY categoria, nombre")->fetch_all(MYSQLI_ASSOC);
@@ -53,10 +53,6 @@ switch ($r) {
       header('Location: ' . $BASE . 'index.php?r=login');
       exit;
     }
-
-  case 'plan_semanal':
-    require_once __DIR__ . '/../App/controllers/ComidasControlador.php';
-
     require_once __DIR__ . '/../App/models/ComidasModelo.php';
     $comidas = ComidasModelo::obtenerPorUsuario($mysqli, $_SESSION['user_id']);
     vista(__DIR__ . '/../App/views/nutricion.php', [
@@ -65,7 +61,16 @@ switch ($r) {
     ]);
     break;
 
-
+    case 'plan_semanal':
+    require_login($BASE); // Asegúrate que solo usuarios logueados lo vean
+    require_once __DIR__ . '/../App/models/PlanSemanalModelo.php';
+    $planSemanal = PlanSemanalModelo::obtenerPorUsuario($mysqli, $_SESSION['user_id']);
+    vista(__DIR__ . '/../App/views/plan_semanal.php', [
+      'BASE' => $BASE,
+      'planSemanal' => $planSemanal
+    ]);
+    break;
+    
   case 'comida_agregar':
     require_once __DIR__ . '/../App/controllers/ComidasControlador.php';
     ComidasControlador::agregar($mysqli);
@@ -76,25 +81,25 @@ switch ($r) {
     ComidasControlador::eliminar($mysqli);
     break;
 
- case 'recetario':
-  require_once __DIR__ . '/../App/controllers/RecetasControlador.php';
-  $q = $_GET['q'] ?? null;
-  $recetas = RecetasControlador::index($mysqli, $q);
-  vista(__DIR__ . '/../App/views/recetario.php', [
-    'BASE' => $BASE,
-    'recetas' => $recetas
-  ]);
-  break;
+  case 'recetario':
+    require_once __DIR__ . '/../App/controllers/RecetasControlador.php';
+    $q = $_GET['q'] ?? null;
+    $recetas = RecetasControlador::index($mysqli, $q);
+    vista(__DIR__ . '/../App/views/recetario.php', [
+      'BASE' => $BASE,
+      'recetas' => $recetas
+    ]);
+    break;
 
-case 'receta':
-  require_once __DIR__ . '/../App/controllers/RecetasControlador.php';
-  $id = $_GET['id'] ?? 0;
-  $receta = RecetasControlador::detalle($mysqli, $id);
-  vista(__DIR__ . '/../App/views/receta.php', [
-    'BASE' => $BASE,
-    'receta' => $receta
-  ]);
-  break;
+  case 'receta':
+    require_once __DIR__ . '/../App/controllers/RecetasControlador.php';
+    $id = $_GET['id'] ?? 0;
+    $receta = RecetasControlador::detalle($mysqli, $id);
+    vista(__DIR__ . '/../App/views/receta.php', [
+      'BASE' => $BASE,
+      'receta' => $receta
+    ]);
+    break;
 
 
 

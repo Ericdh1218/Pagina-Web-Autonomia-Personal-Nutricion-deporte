@@ -1,26 +1,31 @@
 <div class="container mx-auto px-6 py-8">
 
-  <div class="flex justify-between items-center mb-8">
-    <h1 class="text-3xl font-bold">📚 Recetario</h1>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center mb-8">
     
-    <div class="flex items-center space-x-4">
+    <div>
+      <h1 class="text-3xl font-bold">📚 Recetario</h1>
+      <form method="get" action="<?= $BASE ?>index.php" class="flex gap-2 mt-4">
+        <input type="hidden" name="r" value="recetario">
+        <input type="text" name="q" placeholder="Buscar receta..." class="border p-2 rounded w-full">
+        <button class="bg-violet-600 text-white px-6 py-2 rounded">Buscar</button>
+      </form>
+    </div>
+
+    <div class="flex items-center justify-start md:justify-end gap-3">
       <a href="<?= $BASE ?>index.php?r=inicio"
-         class="bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-lg shadow">
+         class="text-center bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg shadow-sm">
          Volver al inicio
       </a>
 
       <a href="<?= $BASE ?>index.php?r=nutricion"
-         class="bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-lg shadow">
+         class="text-center bg-violet-600 hover:bg-violet-700 text-white font-semibold px-4 py-2 rounded-lg shadow">
          Ir a Nutrición
       </a>
     </div>
-  </div> 
-  <!-- Buscador -->
-  <form method="get" action="<?= $BASE ?>index.php">
-    <input type="hidden" name="r" value="recetario">
-    <input type="text" name="q" placeholder="Buscar receta..." class="border p-2 rounded w-1/2">
-    <button class="bg-violet-600 text-white px-4 py-2 rounded">Buscar</button>
-  </form>
+  </div>
+
+  </div>
+
 
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
     <?php if (!empty($recetas)): ?>

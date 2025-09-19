@@ -1,3 +1,14 @@
+document.addEventListener('DOMContentLoaded', (event) => {
+    const menuButton = document.getElementById("menu-toggle");
+    const menu = document.getElementById("menu");
+
+    if (menuButton && menu) {
+        menuButton.addEventListener("click", function () {
+            menu.classList.toggle("hidden");
+        });
+    }
+});
+
 // --- Calculadora de IMC (con manejo de errores en UI) ---
 function calculateBMI() {
   const weight = parseFloat(document.getElementById("weight").value);
