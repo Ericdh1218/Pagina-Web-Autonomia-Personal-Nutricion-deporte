@@ -1,6 +1,10 @@
 <div class="container mx-auto px-6 py-8">
   <?php if ($receta): ?>
     <h1 class="text-3xl font-bold mb-6 text-gray-800"><?= e($receta['titulo']) ?></h1>
+    <a href="<?= $BASE ?>index.php?r=recetario" 
+         class="bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-lg shadow">
+        ⬅ Volver al Recetario
+      </a>
 
     <?php if (!empty($receta['imagen'])): ?>
       <div class="flex justify-center mb-6">

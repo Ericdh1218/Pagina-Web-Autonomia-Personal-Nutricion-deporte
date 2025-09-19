@@ -29,3 +29,26 @@ CREATE TABLE comidas (
     categoria VARCHAR(100) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+  CREATE TABLE objetivos (
+     id INT AUTO_INCREMENT PRIMARY KEY,
+     titulo VARCHAR(100) NOT NULL,
+     descripcion TEXT
+   );
+
+  CREATE TABLE ejercicios (
+   id INT AUTO_INCREMENT PRIMARY KEY,
+   nombre VARCHAR(100) NOT NULL,
+   categoria VARCHAR(50),
+   descripcion TEXT
+ );
+
+ CREATE TABLE plan_semanal (
+     id INT AUTO_INCREMENT PRIMARY KEY,
+     user_id INT NOT NULL,
+     dia_semana ENUM('lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo') NOT NULL,
+     tipo_comida ENUM('desayuno', 'almuerzo', 'cena') NOT NULL,
+     receta_id INT NOT NULL,
+     FOREIGN KEY (user_id) REFERENCES users(id),
+     FOREIGN KEY (receta_id) REFERENCES recetas(id)
+ );

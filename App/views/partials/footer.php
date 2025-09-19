@@ -14,7 +14,7 @@
           <h4 class="text-lg font-semibold mb-4">Nutrición</h4>
           <ul class="space-y-2 text-gray-400">
             <li><a href="index.php?r=nutricion" class="hover:text-white transition-colors">Planes de Alimentación</a></li>
-            <li><a href="index.php?r=nutricion.php" class="hover:text-white transition-colors">Recetas Saludables</a></li>
+            <li><a href="index.php?r=recetario" class="hover:text-white transition-colors">Recetas Saludables</a></li>
             <li><a href="index.php?r=herramientas" class="hover:text-white transition-colors">Calculadoras</a></li>
 
           </ul>
@@ -30,7 +30,7 @@
         <div>
           <h4 class="text-lg font-semibold mb-4">Contacto</h4>
           <ul class="space-y-2 text-gray-400">
-            <li>📧 braulio.diego@gmail.com</li>
+            <li>📧 vitabalance@gmail.com</li>
             <li>📱 +52 2222175420</li>
             <li>🌐 www.vitabalance.com</li>
           </ul>

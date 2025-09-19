@@ -9,7 +9,7 @@
   <!-- OJO: paths absolutos desde /Public como raíz -->
   <link rel="stylesheet" href="/ProyectoAutonomiaPersonal/Public/assets/css/main.css">
   <link rel="stylesheet" href="<?= $BASE ?>assets/css/main.css">
-<script src="<?= $BASE ?>assets/js/main.js"></script>
+<script src="<?= $BASE ?>assets/js/main.js?v=1.1"></script>
 
 </head>
 <body class="bg-gray-50">
@@ -20,6 +20,6 @@
   </main>
 
   <?php if(file_exists(__DIR__.'/../partials/footer.php')) require __DIR__.'/../partials/footer.php'; ?>
-  <script src="/ProyectoAutonomiaPersonal/Public/assets/js/main.js"></script>
+  <script src="/ProyectoAutonomiaPersonal/Public/assets/js/main.js?v=1.1"></script>
 </body>
 </html>

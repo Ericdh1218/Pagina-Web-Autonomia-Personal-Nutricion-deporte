@@ -9,7 +9,36 @@ $r = $_GET['r'] ?? 'inicio';
 
 switch ($r) {
   case 'inicio':
-    vista(__DIR__ . '/../App/views/inicio.php', ['BASE' => $BASE]);
+  $objetivosCount = $mysqli->query("SELECT COUNT(*) AS total FROM objetivos")->fetch_assoc()['total'];
+  $ejerciciosCount = $mysqli->query("SELECT COUNT(*) AS total FROM ejercicios")->fetch_assoc()['total'];
+  $recetasCount = $mysqli->query("SELECT COUNT(*) AS total FROM recetas")->fetch_assoc()['total'];
+
+  vista(__DIR__ . '/../App/views/inicio.php', [
+    'BASE' => $BASE,
+    'objetivosCount' => $objetivosCount,
+    'ejerciciosCount' => $ejerciciosCount,
+    'recetasCount'   => $recetasCount
+  ]);
+  break;
+
+  case 'objetivos':
+    // Obtenemos todos los objetivos de la base de datos
+    $objetivos = $mysqli->query("SELECT * FROM objetivos ORDER BY id DESC")->fetch_all(MYSQLI_ASSOC);
+    // Mostramos la nueva vista 'objetivos.php' y le pasamos los datos
+    vista(__DIR__ . '/../App/views/objetivos.php', [
+      'BASE' => $BASE,
+      'objetivos' => $objetivos
+    ]);
+    break;
+  
+  case 'ejercicios':
+    // Obtenemos todos los ejercicios de la base de datos
+    $ejercicios = $mysqli->query("SELECT * FROM ejercicios ORDER BY categoria, nombre")->fetch_all(MYSQLI_ASSOC);
+    // Mostramos la nueva vista 'ejercicios.php' y le pasamos los datos
+    vista(__DIR__ . '/../App/views/ejercicios.php', [
+      'BASE' => $BASE,
+      'ejercicios' => $ejercicios
+    ]);
     break;
 
   case 'deporte':
@@ -24,6 +53,9 @@ switch ($r) {
       header('Location: ' . $BASE . 'index.php?r=login');
       exit;
     }
+
+  case 'plan_semanal':
+    require_once __DIR__ . '/../App/controllers/ComidasControlador.php';
 
     require_once __DIR__ . '/../App/models/ComidasModelo.php';
     $comidas = ComidasModelo::obtenerPorUsuario($mysqli, $_SESSION['user_id']);
@@ -109,6 +141,9 @@ case 'receta':
 
   case 'registro_post':
     require_once __DIR__ . '/../App/models/UsuariosModelo.php';
+
+
+
 
     $nombre = trim($_POST['nombre'] ?? '');
     $correo = trim($_POST['correo'] ?? '');
