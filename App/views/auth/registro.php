@@ -9,7 +9,7 @@
 <form method="post" action="<?= $BASE ?>index.php?r=registro_post" class="max-w-md space-y-3">
   <input class="w-full border p-2 rounded" type="text" name="nombre" placeholder="Nombre completo" value="<?= old('nombre') ?>" required>
   <input class="w-full border p-2 rounded" type="email" name="correo" placeholder="Correo electrónico" value="<?= old('correo') ?>" required>
-  <input class="w-full border p-2 rounded" type="password" name="password" placeholder="Contraseña (mín. 6)" required>
+  <input class="w-full border p-2 rounded" type="password" name="password" placeholder="Contraseña (mín. 6 caracteres, letras y números)" required>
   <input class="w-full border p-2 rounded" type="password" name="password2" placeholder="Repite la contraseña" required>
   <button class="bg-blue-600 text-white px-4 py-2 rounded">Registrarme</button>
 </form>

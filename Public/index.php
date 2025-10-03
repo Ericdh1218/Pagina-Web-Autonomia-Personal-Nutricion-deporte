@@ -61,7 +61,7 @@ switch ($r) {
     ]);
     break;
 
-    case 'plan_semanal':
+  case 'plan_semanal':
     require_login($BASE); // Asegúrate que solo usuarios logueados lo vean
     require_once __DIR__ . '/../App/models/PlanSemanalModelo.php';
     $planSemanal = PlanSemanalModelo::obtenerPorUsuario($mysqli, $_SESSION['user_id']);
@@ -70,7 +70,7 @@ switch ($r) {
       'planSemanal' => $planSemanal
     ]);
     break;
-    
+
   case 'comida_agregar':
     require_once __DIR__ . '/../App/controllers/ComidasControlador.php';
     ComidasControlador::agregar($mysqli);
@@ -83,11 +83,20 @@ switch ($r) {
 
   case 'recetario':
     require_once __DIR__ . '/../App/controllers/RecetasControlador.php';
+
+    // 1. Capturamos AMBOS parámetros de la URL (texto y categoría)
     $q = $_GET['q'] ?? null;
-    $recetas = RecetasControlador::index($mysqli, $q);
+    $categoria = $_GET['categoria'] ?? null;
+
+    // 2. Llamamos al controlador con AMBOS parámetros
+    $recetas = RecetasControlador::index($mysqli, $q, $categoria);
+
+    // 3. Pasamos los resultados Y los términos de búsqueda a la vista
     vista(__DIR__ . '/../App/views/recetario.php', [
       'BASE' => $BASE,
-      'recetas' => $recetas
+      'recetas' => $recetas,
+      'searchTerm' => $q,          // Para que el campo de texto recuerde lo que se buscó
+      'selectedCategory' => $categoria   // Para que el menú desplegable recuerde la selección
     ]);
     break;
 
@@ -101,7 +110,23 @@ switch ($r) {
     ]);
     break;
 
+  case 'Micuenta':
+    require_login($BASE); // Correcto, mantiene al usuario seguro
 
+    // --- LÓGICA MODIFICADA ---
+    // 1. Carga el modelo que acabamos de modificar
+    require_once __DIR__ . '/../App/models/UsuariosModelo.php';
+
+    // 2. Busca los datos completos del usuario usando el ID de la sesión
+    $usuario = Usuario::buscarPorId($mysqli, $_SESSION['user_id']);
+
+    // 3. Pasa los datos del usuario a la vista
+    vista(__DIR__ . '/../App/views/Micuenta.php', [
+      'BASE' => $BASE,
+      'usuario' => $usuario // Pasamos el array completo con los datos del usuario
+    ]);
+    // --- FIN DE LA MODIFICACIÓN ---
+    break;
 
   case 'guias':
     vista(__DIR__ . '/../App/views/guias.php', ['BASE' => $BASE]);
@@ -111,10 +136,106 @@ switch ($r) {
     require_login($BASE);
     vista(__DIR__ . '/../App/views/herramientas.php', ['BASE' => $BASE]);
     break;
+  case 'guardar_imc':
+    // Solo responde a peticiones POST y si el usuario está logueado
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST' || empty($_SESSION['user_id'])) {
+        http_response_code(403); // Forbidden
+        echo json_encode(['status' => 'error', 'message' => 'Acceso no permitido']);
+        exit;
+    }
+
+    // 1. Obtener los datos JSON enviados desde JavaScript
+    $data = json_decode(file_get_contents('php://input'), true);
+    $peso = $data['peso'] ?? 0;
+    $altura = $data['altura'] ?? 0;
+
+    // 2. Validar y calcular el IMC en el servidor (más seguro)
+    if ($peso > 0 && $altura > 0) {
+        $alturaEnMetros = $altura / 100;
+        $imc = round($peso / ($alturaEnMetros ** 2), 1);
+        
+        // 3. Guardar en la base de datos
+        require_once __DIR__ . '/../App/models/UsuariosModelo.php';
+        Usuario::actualizarDatosIMC($mysqli, $_SESSION['user_id'], $peso, $altura, $imc);
+
+        // 4. Enviar respuesta de éxito
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'ok', 'message' => 'Datos guardados']);
+    } else {
+        // Enviar respuesta de error
+        header('Content-Type: application/json');
+        http_response_code(400); // Bad Request
+        echo json_encode(['status' => 'error', 'message' => 'Datos inválidos']);
+    }
+    exit; // Termina la ejecución aquí
 
   case 'login':
     vista(__DIR__ . '/../App/views/auth/login.php', ['BASE' => $BASE]);
     break;
+
+  // ... otros casos como 'login', 'registro', etc. ...
+
+  // --- AÑADE ESTAS DOS NUEVAS RUTAS ---
+
+  // Ruta para MOSTRAR el formulario de cambio de contraseña
+  case 'cambiar_password':
+    require_login($BASE); // Solo usuarios logueados pueden acceder
+    vista(__DIR__ . '/../App/views/auth/cambiar_password.php', ['BASE' => $BASE]);
+    break;
+
+  // Ruta para PROCESAR el formulario enviado
+  case 'cambiar_password_post':
+    require_login($BASE); // Seguridad primero
+
+    // 1. Cargar el modelo
+    require_once __DIR__ . '/../App/models/UsuariosModelo.php';
+
+    // 2. Obtener datos del formulario y el ID de la sesión
+    $userId = $_SESSION['user_id'];
+    $passActual = $_POST['password_actual'] ?? '';
+    $nuevoPass = $_POST['nuevo_password'] ?? '';
+    $nuevoPass2 = $_POST['nuevo_password2'] ?? '';
+
+    // 3. Validaciones
+    if (empty($passActual) || empty($nuevoPass) || empty($nuevoPass2)) {
+      flash('error', 'Todos los campos son obligatorios.');
+      header('Location: ' . $BASE . 'index.php?r=cambiar_password');
+      exit;
+    }
+
+    if (strlen($nuevoPass) < 8) {
+      flash('error', 'La nueva contraseña debe tener al menos 8 caracteres.');
+      header('Location: ' . $BASE . 'index.php?r=cambiar_password');
+      exit;
+    }
+
+    if ($nuevoPass !== $nuevoPass2) {
+      flash('error', 'Las nuevas contraseñas no coinciden.');
+      header('Location: ' . $BASE . 'index.php?r=cambiar_password');
+      exit;
+    }
+
+    // ... en index.php dentro de case 'cambiar_password_post':
+
+    // 4. Verificar la contraseña actual
+    $usuario = Usuario::buscarPorId($mysqli, $userId);
+
+    if (!$usuario || !password_verify($passActual, $usuario['password_hash'])) {
+      flash('error', 'La contraseña actual es incorrecta.');
+      header('Location: ' . $BASE . 'index.php?r=cambiar_password');
+      exit;
+    }
+
+    // ...
+
+    // 5. Si todo es correcto, actualizar la contraseña
+    Usuario::actualizarPassword($mysqli, $userId, $nuevoPass);
+
+    flash('ok', '¡Contraseña actualizada correctamente!');
+    header('Location: ' . $BASE . 'index.php?r=Micuenta');
+    exit;
+
+  // ... otros casos como 'logout', etc. ...
 
   case 'login_post':
     require_once __DIR__ . '/../App/models/UsuariosModelo.php';

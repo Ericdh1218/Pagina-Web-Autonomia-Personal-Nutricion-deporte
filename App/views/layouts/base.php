@@ -1,25 +1,30 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>VitaBalance</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <!-- OJO: paths absolutos desde /Public como raíz -->
-  <link rel="stylesheet" href="/ProyectoAutonomiaPersonal/Public/assets/css/main.css">
-  <link rel="stylesheet" href="<?= $BASE ?>assets/css/main.css">
-<script src="<?= $BASE ?>assets/js/main.js?v=1.1"></script>
-
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>VitaBalance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="<?= $BASE ?>assets/css/main.css">
 </head>
 <body class="bg-gray-50">
-  <?php if(file_exists(__DIR__.'/../partials/header.php')) require __DIR__.'/../partials/header.php'; ?>
 
-  <main class="container mx-auto px-6 py-8">
-    <?= $contenido ?? '' ?>
-  </main>
+    <?php if(file_exists(__DIR__.'/../partials/header.php')) require __DIR__.'/../partials/header.php'; ?>
 
-  <?php if(file_exists(__DIR__.'/../partials/footer.php')) require __DIR__.'/../partials/footer.php'; ?>
-  <script src="/ProyectoAutonomiaPersonal/Public/assets/js/main.js?v=1.1"></script>
+    <main>
+        <?= $contenido ?? '' ?>
+    </main>
+
+    <?php if(file_exists(__DIR__.'/../partials/footer.php')) require __DIR__.'/../partials/footer.php'; ?>
+
+    <!-- En App/views/layouts/base.php, antes de cargar main.js -->
+<script>
+    const userIsLoggedIn = <?= isset($_SESSION['user_id']) ? 'true' : 'false' ?>;
+    const BASE = '<?= $BASE ?>'; // Añade esta línea
+</script>
+
+<script src="<?= $BASE ?>assets/js/main.js?v=1.2"></script> <!-- Aumenta la versión para evitar caché -->
+
 </body>
 </html>

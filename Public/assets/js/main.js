@@ -9,41 +9,87 @@ document.addEventListener('DOMContentLoaded', (event) => {
     }
 });
 
-// --- Calculadora de IMC (con manejo de errores en UI) ---
-function calculateBMI() {
-  const weight = parseFloat(document.getElementById("weight").value);
-  const height = parseFloat(document.getElementById("height").value);
-  const resultDiv = document.getElementById("bmi-result");
-  const valueEl = document.getElementById("bmi-value");
-  const categoryEl = document.getElementById("bmi-category");
+ function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
 
-  if (weight > 0 && height > 0) {
-    const bmi = (weight / (height / 100) ** 2).toFixed(1);
-    valueEl.textContent = `Tu IMC: ${bmi}`;
-    let category, colorClass;
-    if (bmi < 18.5) {
-      category = "Bajo peso";
-      colorClass = "bg-blue-100 text-blue-800";
-    } else if (bmi < 25) {
-      category = "Peso normal";
-      colorClass = "bg-green-100 text-green-800";
-    } else if (bmi < 30) {
-      category = "Sobrepeso";
-      colorClass = "bg-yellow-100 text-yellow-800";
-    } else {
-      category = "Obesidad";
-      colorClass = "bg-red-100 text-red-800";
+// --- Calculadora de IMC (con manejo de errores en UI) ---
+// En tu archivo assets/js/main.js
+
+function calculateBMI() {
+    const weightInput = document.getElementById("weight");
+    const heightInput = document.getElementById("height");
+    const resultDiv = document.getElementById("bmi-result");
+    const valueEl = document.getElementById("bmi-value");
+    const categoryEl = document.getElementById("bmi-category");
+
+    // Validamos que los elementos existan antes de usarlos
+    if (!weightInput || !heightInput || !resultDiv || !valueEl || !categoryEl) {
+        console.error("Faltan elementos de la calculadora de IMC en el DOM.");
+        return;
     }
-    categoryEl.textContent = category;
-    resultDiv.className = `text-center p-4 rounded-lg mt-4 ${colorClass}`;
-    resultDiv.classList.remove("hidden");
-  } else {
-    resultDiv.className =
-      "text-center p-4 rounded-lg mt-4 bg-red-100 text-red-800";
-    valueEl.textContent = "Por favor, introduce valores válidos.";
-    categoryEl.textContent = "";
-    resultDiv.classList.remove("hidden");
-  }
+    
+    const weight = parseFloat(weightInput.value);
+    const height = parseFloat(heightInput.value);
+
+    if (weight > 0 && height > 0) {
+        const bmi = (weight / (height / 100) ** 2).toFixed(1);
+        valueEl.textContent = `Tu IMC: ${bmi}`;
+        
+        let category, colorClass;
+        if (bmi < 18.5) {
+            category = "Bajo peso";
+            colorClass = "bg-blue-100 text-blue-800";
+        } else if (bmi < 25) {
+            category = "Peso normal";
+            colorClass = "bg-green-100 text-green-800";
+        } else if (bmi < 30) {
+            category = "Sobrepeso";
+            colorClass = "bg-yellow-100 text-yellow-800";
+        } else {
+            category = "Obesidad";
+            colorClass = "bg-red-100 text-red-800";
+        }
+        categoryEl.textContent = category;
+        resultDiv.className = `text-center p-4 rounded-lg mt-4 ${colorClass}`;
+        resultDiv.classList.remove("hidden");
+
+        // --- ESTA ES LA PARTE CLAVE QUE FALTABA ---
+        // Verificamos si la variable global 'userIsLoggedIn' existe y es verdadera
+        if (typeof userIsLoggedIn !== 'undefined' && userIsLoggedIn) {
+            
+            // Usamos la variable BASE para construir la URL correcta
+            const url = `${BASE}index.php?r=guardar_imc`;
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ peso: weight, altura: height })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'ok') {
+                    console.log('IMC guardado exitosamente en tu perfil.');
+                    // Opcional: podrías mostrar una pequeña notificación de "Guardado"
+                } else {
+                    console.error('Error del servidor:', data.message);
+                }
+            })
+            .catch(error => console.error('Error de red al intentar guardar el IMC:', error));
+        }
+        // --- FIN DE LA PARTE CLAVE ---
+
+    } else {
+        resultDiv.className = "text-center p-4 rounded-lg mt-4 bg-red-100 text-red-800";
+        valueEl.textContent = "Por favor, introduce valores válidos.";
+        categoryEl.textContent = "";
+        resultDiv.classList.remove("hidden");
+    }
 }
 
 // --- Plan de Comidas Toggle (con transición suave) ---
