@@ -43,6 +43,42 @@
     </div>
 </div>
 
+<?php if ($rutinaSugerida): ?>
+<div class="mb-12 bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-violet-100">
+    <h2 class="text-3xl font-bold text-gray-800 mb-2">Tu Rutina Sugerida</h2>
+    <p class="text-gray-600 mb-6">Basada en tu nivel de actividad <span class="font-semibold text-violet-600 capitalize"><?= e($nivelActual) ?></span>, te recomendamos empezar con esta rutina.</p>
+
+    <div class="border-t border-gray-200 pt-6">
+        <h3 class="text-2xl font-bold text-violet-700 mb-4"><?= e($rutinaSugerida['nombre_rutina']) ?></h3>
+        <div class="space-y-4">
+            <?php foreach ($rutinaSugerida['ejercicios'] as $ejercicio): ?>
+                <div class="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
+                    <img src="<?= $BASE ?>assets/img/<?= e($ejercicio['media_url']) ?>" alt="<?= e($ejercicio['nombre']) ?>" class="w-16 h-16 object-cover rounded-md border">
+                    <div>
+                        <p class="font-semibold text-lg"><?= e($ejercicio['nombre']) ?></p>
+                        <p class="text-gray-500"><?= e($ejercicio['series_reps']) ?></p>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+
+    <div class="mt-8 text-center bg-violet-50 p-4 rounded-lg">
+        <p class="text-gray-700">¿Sientes que esta rutina es muy fácil o muy difícil?</p>
+        <p class="text-sm text-gray-500 mb-3">Actualiza tu nivel para recibir nuevas sugerencias.</p>
+        <form method="post" action="<?= $BASE ?>index.php?r=actualizar_nivel" class="inline-flex items-center gap-2">
+            <select name="nuevo_nivel" class="border border-gray-300 rounded-md px-3 py-1">
+                <option value="sedentario" <?= $nivelActual === 'sedentario' ? 'selected' : '' ?>>Principiante</option>
+                <option value="ligero" <?= $nivelActual === 'ligero' ? 'selected' : '' ?>>Principiante+</option>
+                <option value="activo" <?= $nivelActual === 'activo' ? 'selected' : '' ?>>Intermedio</option>
+                <option value="muy_activo" <?= $nivelActual === 'muy_activo' ? 'selected' : '' ?>>Avanzado</option>
+            </select>
+            <button type="submit" class="bg-violet-600 text-white px-4 py-1 rounded-md hover:bg-violet-700">Guardar</button>
+        </form>
+    </div>
+</div>
+<?php endif; ?>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // ... (Tu script de filtros no necesita ningún cambio)

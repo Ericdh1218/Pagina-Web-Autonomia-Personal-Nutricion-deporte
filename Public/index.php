@@ -42,49 +42,77 @@ switch ($r) {
     break;
 
   case 'deporte':
-    require_login($BASE); // Mantenemos la seguridad
+    require_login($BASE);
+
+    // Cargar todos los modelos necesarios
     require_once __DIR__ . '/../App/models/EjerciciosModelo.php';
+    require_once __DIR__ . '/../App/models/UsuariosModelo.php';
+    require_once __DIR__ . '/../App/models/RutinasModelo.php';
 
-    // 2. Obtener todos los ejercicios
+    // Obtener datos para la vista
     $ejercicios = EjerciciosModelo::obtenerTodos($mysqli);
+    $usuario = Usuario::buscarPorId($mysqli, $_SESSION['user_id']);
+    $nivelActividad = $usuario['nivel_actividad'] ?? 'sedentario';
 
-    // 3. Pasar los ejercicios a la vista
+    // Pedir una rutina sugerida al modelo
+    $rutinaSugerida = RutinasModelo::sugerirRutina($mysqli, $nivelActividad);
+
+    // Enviar todos los datos a la vista
     vista(__DIR__ . '/../App/views/deporte.php', [
       'BASE' => $BASE,
-      'ejercicios' => $ejercicios
+      'ejercicios' => $ejercicios,
+      'rutinaSugerida' => $rutinaSugerida,
+      'nivelActual' => $nivelActividad
     ]);
     break;
 
   // En index.php
 
-// ... (después del 'case deporte')
+  // ... (después del 'case deporte')
 
-case 'ejercicio': // <-- NUEVA RUTA
+  case 'ejercicio': // <-- NUEVA RUTA
     require_login($BASE);
 
     // 1. Cargar el modelo
     require_once __DIR__ . '/../App/models/EjerciciosModelo.php';
-    
+
     // 2. Obtener el ID de la URL
-    $id = (int)($_GET['id'] ?? 0);
-    
+    $id = (int) ($_GET['id'] ?? 0);
+
     // 3. Buscar el ejercicio específico
     $ejercicio = EjerciciosModelo::buscarPorId($mysqli, $id);
-    
+
     // Si no se encuentra el ejercicio, puedes redirigir o mostrar un error
     if (!$ejercicio) {
-        http_response_code(404);
-        echo "Ejercicio no encontrado.";
-        exit;
+      http_response_code(404);
+      echo "Ejercicio no encontrado.";
+      exit;
     }
 
     // 4. Mostrar la nueva vista de detalle
     vista(__DIR__ . '/../App/views/ejercicio_detalle.php', [
-        'BASE' => $BASE,
-        'ejercicio' => $ejercicio
+      'BASE' => $BASE,
+      'ejercicio' => $ejercicio
     ]);
     break;
+  case 'actualizar_nivel':
+    require_login($BASE);
+    require_once __DIR__ . '/../App/models/UsuariosModelo.php';
 
+    $nuevoNivel = $_POST['nuevo_nivel'] ?? 'sedentario';
+    $userId = $_SESSION['user_id'];
+
+    // Validar que el valor sea uno de los permitidos para seguridad
+    if (in_array($nuevoNivel, ['sedentario', 'ligero', 'activo', 'muy_activo'])) {
+      Usuario::actualizarNivelActividad($mysqli, $userId, $nuevoNivel);
+      flash('ok', '¡Tu nivel de actividad ha sido actualizado! Aquí tienes una nueva sugerencia.');
+    } else {
+      flash('error', 'Nivel no válido.');
+    }
+
+    // Redirigir de vuelta a la página de deporte para ver la nueva sugerencia
+    header('Location: ' . $BASE . 'index.php?r=deporte');
+    exit;
   case 'nutricion':
     // si no hay usuario logueado, mándalo a login con un aviso
     if (empty($_SESSION['user_id'])) {

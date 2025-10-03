@@ -59,4 +59,9 @@ public static function actualizarHabitos(mysqli $db, int $userId, string $activi
     $stmt->bind_param('sssiii', $actividad, $objetivo, $alimentacion, $sueno, $agua, $userId);
     return $stmt->execute();
 }
+public static function actualizarNivelActividad(mysqli $db, int $userId, string $nuevoNivel): bool {
+    $stmt = $db->prepare('UPDATE users SET nivel_actividad = ? WHERE id = ?');
+    $stmt->bind_param('si', $nuevoNivel, $userId);
+    return $stmt->execute();
+}
 }
