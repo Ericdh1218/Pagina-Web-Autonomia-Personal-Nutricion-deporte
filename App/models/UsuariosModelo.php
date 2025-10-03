@@ -45,4 +45,18 @@ public static function buscarPorId(mysqli $db, int $id): ?array {
     $stmt->bind_param('dddi', $peso, $altura, $imc, $userId); // 'd' es para decimal/float, 'i' para integer
     return $stmt->execute();
 }
+public static function actualizarHabitos(mysqli $db, int $userId, string $actividad, string $objetivo, string $alimentacion, int $sueno, int $agua): bool {
+    $stmt = $db->prepare(
+        'UPDATE users SET 
+            nivel_actividad = ?, 
+            objetivo_principal = ?, 
+            nivel_alimentacion = ?, 
+            horas_sueno = ?, 
+            consumo_agua = ? 
+        WHERE id = ?'
+    );
+    // Asegúrate que el orden y los tipos coincidan: s, s, s, i, i, i
+    $stmt->bind_param('sssiii', $actividad, $objetivo, $alimentacion, $sueno, $agua, $userId);
+    return $stmt->execute();
+}
 }

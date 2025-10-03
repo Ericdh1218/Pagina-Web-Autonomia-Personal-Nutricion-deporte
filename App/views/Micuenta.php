@@ -30,11 +30,13 @@
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
                         <div>
                             <p class="text-sm text-gray-500 mb-1">⚖️ Peso Registrado</p>
-                            <p class="text-3xl font-bold text-gray-800"><?= e($usuario['peso'] ?? '--') ?> <span class="text-lg font-medium">kg</span></p>
+                            <p class="text-3xl font-bold text-gray-800"><?= e($usuario['peso'] ?? '--') ?> <span
+                                    class="text-lg font-medium">kg</span></p>
                         </div>
                         <div>
                             <p class="text-sm text-gray-500 mb-1">📏 Altura Registrada</p>
-                            <p class="text-3xl font-bold text-gray-800"><?= e($usuario['altura'] ?? '--') ?> <span class="text-lg font-medium">cm</span></p>
+                            <p class="text-3xl font-bold text-gray-800"><?= e($usuario['altura'] ?? '--') ?> <span
+                                    class="text-lg font-medium">cm</span></p>
                         </div>
                         <div>
                             <p class="text-sm text-gray-500 mb-1">📊 Último IMC Calculado</p>
@@ -43,18 +45,48 @@
                     </div>
                 </div>
             </div>
-            
+
+            <hr class="my-8 border-gray-200">
+
+            <div>
+                <h2 class="text-2xl font-semibold mb-6 text-violet-700">Mis Hábitos</h2>
+                <div class="space-y-4 text-lg">
+                    <div class="flex items-center">
+                        <span class="font-semibold w-full sm:w-48">🏃 Nivel de Actividad:</span>
+                        <span
+                            class="text-gray-700 capitalize"><?= e($usuario['nivel_actividad'] ?? 'No definido') ?></span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="font-semibold w-full sm:w-48">🎯 Objetivo Principal:</span>
+                        <span class="text-gray-700"><?= e($usuario['objetivo_principal'] ?? 'No definido') ?></span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="font-semibold w-full sm:w-48">🥗 Mi Alimentación:</span>
+                        <span
+                            class="text-gray-700 capitalize"><?= e($usuario['nivel_alimentacion'] ?? 'No definido') ?></span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="font-semibold w-full sm:w-48">😴 Sueño Promedio:</span>
+                        <span class="text-gray-700"><?= e($usuario['horas_sueno'] ?? '--') ?> horas</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="font-semibold w-full sm:w-48">💧 Agua Diaria:</span>
+                        <span class="text-gray-700"><?= e($usuario['consumo_agua'] ?? '--') ?> vasos</span>
+                    </div>
+                </div>
+            </div>
+
             <hr class="my-8 border-gray-200">
 
             <div>
                 <h2 class="text-2xl font-semibold mb-6 text-violet-700">Seguridad</h2>
                 <div class="flex flex-col sm:flex-row gap-4">
                     <a href="<?= $BASE ?>index.php?r=cambiar_password"
-                       class="w-full text-center bg-violet-600 hover:bg-violet-700 text-white font-semibold px-4 py-3 rounded-lg shadow-sm transition-transform transform hover:scale-105">
+                        class="w-full text-center bg-violet-600 hover:bg-violet-700 text-white font-semibold px-4 py-3 rounded-lg shadow-sm transition-transform transform hover:scale-105">
                         Cambiar Contraseña
                     </a>
                     <a href="index.php?r=eliminar_cuenta"
-                       class="w-full text-center bg-red-100 hover:bg-red-200 text-red-700 font-semibold px-4 py-3 rounded-lg transition-transform transform hover:scale-105">
+                        class="w-full text-center bg-red-100 hover:bg-red-200 text-red-700 font-semibold px-4 py-3 rounded-lg transition-transform transform hover:scale-105">
                         Eliminar Mi Cuenta
                     </a>
                 </div>

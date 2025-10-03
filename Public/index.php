@@ -42,8 +42,47 @@ switch ($r) {
     break;
 
   case 'deporte':
+    require_login($BASE); // Mantenemos la seguridad
+    require_once __DIR__ . '/../App/models/EjerciciosModelo.php';
+
+    // 2. Obtener todos los ejercicios
+    $ejercicios = EjerciciosModelo::obtenerTodos($mysqli);
+
+    // 3. Pasar los ejercicios a la vista
+    vista(__DIR__ . '/../App/views/deporte.php', [
+      'BASE' => $BASE,
+      'ejercicios' => $ejercicios
+    ]);
+    break;
+
+  // En index.php
+
+// ... (después del 'case deporte')
+
+case 'ejercicio': // <-- NUEVA RUTA
     require_login($BASE);
-    vista(__DIR__ . '/../App/views/deporte.php', ['BASE' => $BASE]);
+
+    // 1. Cargar el modelo
+    require_once __DIR__ . '/../App/models/EjerciciosModelo.php';
+    
+    // 2. Obtener el ID de la URL
+    $id = (int)($_GET['id'] ?? 0);
+    
+    // 3. Buscar el ejercicio específico
+    $ejercicio = EjerciciosModelo::buscarPorId($mysqli, $id);
+    
+    // Si no se encuentra el ejercicio, puedes redirigir o mostrar un error
+    if (!$ejercicio) {
+        http_response_code(404);
+        echo "Ejercicio no encontrado.";
+        exit;
+    }
+
+    // 4. Mostrar la nueva vista de detalle
+    vista(__DIR__ . '/../App/views/ejercicio_detalle.php', [
+        'BASE' => $BASE,
+        'ejercicio' => $ejercicio
+    ]);
     break;
 
   case 'nutricion':
@@ -139,9 +178,9 @@ switch ($r) {
   case 'guardar_imc':
     // Solo responde a peticiones POST y si el usuario está logueado
     if ($_SERVER['REQUEST_METHOD'] !== 'POST' || empty($_SESSION['user_id'])) {
-        http_response_code(403); // Forbidden
-        echo json_encode(['status' => 'error', 'message' => 'Acceso no permitido']);
-        exit;
+      http_response_code(403); // Forbidden
+      echo json_encode(['status' => 'error', 'message' => 'Acceso no permitido']);
+      exit;
     }
 
     // 1. Obtener los datos JSON enviados desde JavaScript
@@ -151,23 +190,47 @@ switch ($r) {
 
     // 2. Validar y calcular el IMC en el servidor (más seguro)
     if ($peso > 0 && $altura > 0) {
-        $alturaEnMetros = $altura / 100;
-        $imc = round($peso / ($alturaEnMetros ** 2), 1);
-        
-        // 3. Guardar en la base de datos
-        require_once __DIR__ . '/../App/models/UsuariosModelo.php';
-        Usuario::actualizarDatosIMC($mysqli, $_SESSION['user_id'], $peso, $altura, $imc);
+      $alturaEnMetros = $altura / 100;
+      $imc = round($peso / ($alturaEnMetros ** 2), 1);
 
-        // 4. Enviar respuesta de éxito
-        header('Content-Type: application/json');
-        echo json_encode(['status' => 'ok', 'message' => 'Datos guardados']);
+      // 3. Guardar en la base de datos
+      require_once __DIR__ . '/../App/models/UsuariosModelo.php';
+      Usuario::actualizarDatosIMC($mysqli, $_SESSION['user_id'], $peso, $altura, $imc);
+
+      // 4. Enviar respuesta de éxito
+      header('Content-Type: application/json');
+      echo json_encode(['status' => 'ok', 'message' => 'Datos guardados']);
     } else {
-        // Enviar respuesta de error
-        header('Content-Type: application/json');
-        http_response_code(400); // Bad Request
-        echo json_encode(['status' => 'error', 'message' => 'Datos inválidos']);
+      // Enviar respuesta de error
+      header('Content-Type: application/json');
+      http_response_code(400); // Bad Request
+      echo json_encode(['status' => 'error', 'message' => 'Datos inválidos']);
     }
     exit; // Termina la ejecución aquí
+
+  case 'cuestionario':
+    require_login($BASE);
+    vista(__DIR__ . '/../App/views/cuestionario.php', ['BASE' => $BASE]);
+    break;
+
+  // Ruta para PROCESAR y GUARDAR los datos del cuestionario
+  case 'cuestionario_post':
+    require_login($BASE);
+
+    $userId = $_SESSION['user_id'];
+    $actividad = $_POST['nivel_actividad'] ?? '';
+    $objetivo = $_POST['objetivo_principal'] ?? '';
+    $alimentacion = $_POST['nivel_alimentacion'] ?? '';
+    $sueno = (int) ($_POST['horas_sueno'] ?? 0);
+    $agua = (int) ($_POST['consumo_agua'] ?? 0);
+
+    require_once __DIR__ . '/../App/models/UsuariosModelo.php';
+    Usuario::actualizarHabitos($mysqli, $userId, $actividad, $objetivo, $alimentacion, $sueno, $agua);
+
+    flash('ok', '¡Tu perfil ha sido actualizado con tus hábitos!');
+    header('Location: ' . $BASE . 'index.php?r=Micuenta');
+    exit;
+  // --- FIN DE LOS NUEVOS CASOS ---
 
   case 'login':
     vista(__DIR__ . '/../App/views/auth/login.php', ['BASE' => $BASE]);
@@ -268,16 +331,21 @@ switch ($r) {
   case 'registro_post':
     require_once __DIR__ . '/../App/models/UsuariosModelo.php';
 
-
-
-
     $nombre = trim($_POST['nombre'] ?? '');
     $correo = trim($_POST['correo'] ?? '');
     $pass = $_POST['password'] ?? '';
     $pass2 = $_POST['password2'] ?? '';
 
-    if ($nombre === '' || !filter_var($correo, FILTER_VALIDATE_EMAIL) || strlen($pass) < 6 || $pass !== $pass2) {
-      flash('error', 'Datos inválidos.');
+    // --- VALIDACIÓN DE CONTRASEÑA MEJORADA ---
+    $passwordRegex = '/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/';
+
+    if (
+      empty($nombre) ||
+      !filter_var($correo, FILTER_VALIDATE_EMAIL) ||
+      !preg_match($passwordRegex, $pass) || // Nueva validación más segura
+      $pass !== $pass2
+    ) {
+      flash('error', 'Datos inválidos. La contraseña debe tener al menos 8 caracteres, incluyendo letras y números.');
       header('Location: ' . $BASE . 'index.php?r=registro');
       exit;
     }
@@ -288,9 +356,20 @@ switch ($r) {
       exit;
     }
 
+    // Crea el usuario en la base de datos
     Usuario::crear($mysqli, $nombre, $correo, $pass);
-    flash('ok', 'Cuenta creada. Ahora inicia sesión.');
-    header('Location: ' . $BASE . 'index.php?r=login');
+
+    // --- REDIRECCIÓN MEJORADA ---
+    // Inicia sesión automáticamente al nuevo usuario
+    $user = Usuario::buscarPorCorreo($mysqli, $correo);
+    if ($user) {
+      $_SESSION['user_id'] = $user['id'];
+      $_SESSION['user_name'] = $user['nombre'];
+    }
+
+    // Redirige al cuestionario en lugar de a la página de login
+    flash('ok', '¡Cuenta creada! Ahora, cuéntanos sobre tus hábitos.');
+    header('Location: ' . $BASE . 'index.php?r=cuestionario');
     exit;
 
   case 'logout':
