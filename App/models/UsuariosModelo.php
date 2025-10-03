@@ -64,4 +64,15 @@ public static function actualizarNivelActividad(mysqli $db, int $userId, string 
     $stmt->bind_param('si', $nuevoNivel, $userId);
     return $stmt->execute();
 }
+
+// En App/models/UsuariosModelo.php
+
+public static function eliminar(mysqli $db, int $userId): bool {
+    // Prepara la consulta para borrar al usuario por su ID
+    $stmt = $db->prepare('DELETE FROM users WHERE id = ?');
+    $stmt->bind_param('i', $userId);
+    
+    // Ejecuta y devuelve true si fue exitoso
+    return $stmt->execute();
+}
 }

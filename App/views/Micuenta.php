@@ -85,13 +85,49 @@
                         class="w-full text-center bg-violet-600 hover:bg-violet-700 text-white font-semibold px-4 py-3 rounded-lg shadow-sm transition-transform transform hover:scale-105">
                         Cambiar Contraseña
                     </a>
-                    <a href="index.php?r=eliminar_cuenta"
+                   
+
+                    <button onclick="openDeleteModal()"
                         class="w-full text-center bg-red-100 hover:bg-red-200 text-red-700 font-semibold px-4 py-3 rounded-lg transition-transform transform hover:scale-105">
                         Eliminar Mi Cuenta
-                    </a>
+                    </button>
                 </div>
             </div>
 
         </div>
     </div>
 </section>
+<div id="delete-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+    <div class="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full">
+        <h3 class="text-2xl font-bold text-gray-800 text-center">Confirmar Eliminación</h3>
+        <p class="text-center text-gray-600 mt-2 mb-6">Esta acción es irreversible. Todos tus datos, planes y progresos serán eliminados permanentemente.</p>
+        
+        <form method="post" action="<?= $BASE ?>index.php?r=eliminar_cuenta_post" class="space-y-4">
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700">Para confirmar, por favor, introduce tu contraseña:</label>
+                <input type="password" name="password" id="password" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm">
+            </div>
+            
+            <div class="flex gap-4 mt-6">
+                <button type="button" onclick="closeDeleteModal()" class="w-full text-center bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 rounded-lg">
+                    Cancelar
+                </button>
+                <button type="submit" class="w-full text-center bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-lg">
+                    Sí, Eliminar Mi Cuenta
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const deleteModal = document.getElementById('delete-modal');
+
+    function openDeleteModal() {
+        if (deleteModal) deleteModal.classList.remove('hidden');
+    }
+
+    function closeDeleteModal() {
+        if (deleteModal) deleteModal.classList.add('hidden');
+    }
+</script>

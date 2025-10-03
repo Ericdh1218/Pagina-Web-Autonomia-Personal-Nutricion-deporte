@@ -400,6 +400,32 @@ switch ($r) {
     header('Location: ' . $BASE . 'index.php?r=cuestionario');
     exit;
 
+  case 'eliminar_cuenta_post':
+    require_login($BASE);
+
+    // 1. Cargar el modelo y obtener datos
+    require_once __DIR__ . '/../App/models/UsuariosModelo.php';
+    $userId = $_SESSION['user_id'];
+    $password = $_POST['password'] ?? '';
+
+    // 2. Verificar la contraseña por seguridad
+    $usuario = Usuario::buscarPorId($mysqli, $userId);
+    if (!$usuario || !password_verify($password, $usuario['password_hash'])) {
+        flash('error', 'La contraseña es incorrecta. No se pudo eliminar la cuenta.');
+        header('Location: ' . $BASE . 'index.php?r=Micuenta');
+        exit;
+    }
+
+    // 3. Si la contraseña es correcta, eliminar la cuenta
+    Usuario::eliminar($mysqli, $userId);
+
+    // 4. Destruir la sesión y redirigir
+    session_destroy();
+    session_start(); // Iniciar una nueva sesión limpia para el mensaje flash
+    flash('ok', 'Tu cuenta ha sido eliminada permanentemente. Esperamos verte de nuevo.');
+    header('Location: ' . $BASE . 'index.php?r=inicio');
+    exit;
+
   case 'logout':
     session_destroy();
     header('Location: ' . $BASE . 'index.php?r=inicio');
