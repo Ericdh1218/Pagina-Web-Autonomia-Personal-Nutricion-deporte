@@ -1,30 +1,29 @@
 CREATE DATABASE IF NOT EXISTS NutriUsers CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE NutriUsers;
 
--- Tabla de usuarios con métricas y hábitos personales
+-- --------------------------------------------------------
+-- TABLAS PRINCIPALES (SIN DEPENDENCIAS EXTERNAS)
+-- --------------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     correo VARCHAR(100) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
     is_admin TINYINT(1) NOT NULL DEFAULT 0,
-    
-    -- Datos de la calculadora de IMC
     peso DECIMAL(5,2) NULL,
     altura DECIMAL(5,1) NULL,
     imc DECIMAL(5,1) NULL,
-    
-    -- Datos del cuestionario de hábitos
     nivel_actividad ENUM('sedentario', 'ligero', 'activo', 'muy_activo') NULL,
     objetivo_principal VARCHAR(255) NULL,
     nivel_alimentacion ENUM('novato', 'aprendiendo', 'consciente', 'autonomo') NULL,
     horas_sueno INT NULL,
     consumo_agua INT NULL,
-    
+    password_reset_token VARCHAR(255) NULL,
+    password_reset_expires DATETIME NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Tabla de recetas con la categoría actualizada a ENUM
 CREATE TABLE IF NOT EXISTS recetas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     titulo VARCHAR(255) NOT NULL,
@@ -36,23 +35,23 @@ CREATE TABLE IF NOT EXISTS recetas (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Tabla de ejercicios con campo para imagen/media
+-- TABLA DE EJERCICIOS ACTUALIZADA CON MÚLTIPLES CATEGORÍAS
 CREATE TABLE IF NOT EXISTS ejercicios (
    id INT AUTO_INCREMENT PRIMARY KEY,
    nombre VARCHAR(100) NOT NULL,
-   categoria VARCHAR(50),
+   grupo_muscular ENUM('Tren Superior', 'Tren Inferior', 'Core', 'Cuerpo Completo') NOT NULL,
+   tipo_entrenamiento ENUM('Fuerza', 'Cardio', 'Flexibilidad', 'Calentamiento') NOT NULL,
+   equipamiento ENUM('Sin Equipo', 'Equipo Ligero', 'Gimnasio') NOT NULL,
    descripcion TEXT,
    media_url VARCHAR(255) NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Tabla de objetivos generales (no depende de otras)
 CREATE TABLE IF NOT EXISTS objetivos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     titulo VARCHAR(100) NOT NULL,
     descripcion TEXT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Tabla para guardar las rutinas prediseñadas
 CREATE TABLE IF NOT EXISTS rutinas_prediseñadas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre_rutina VARCHAR(255) NOT NULL,
@@ -60,7 +59,11 @@ CREATE TABLE IF NOT EXISTS rutinas_prediseñadas (
     nivel ENUM('principiante', 'intermedio', 'avanzado') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Tabla de comidas registradas por el usuario
+
+-- --------------------------------------------------------
+-- TABLAS SECUNDARIAS (CON DEPENDENCIAS / FOREIGN KEYS)
+-- --------------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS comidas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -70,7 +73,6 @@ CREATE TABLE IF NOT EXISTS comidas (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Tabla para el plan de comidas semanal del usuario
 CREATE TABLE IF NOT EXISTS plan_semanal (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -81,7 +83,6 @@ CREATE TABLE IF NOT EXISTS plan_semanal (
     FOREIGN KEY (receta_id) REFERENCES recetas(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Tabla para enlazar rutinas prediseñadas con sus ejercicios
 CREATE TABLE IF NOT EXISTS rutina_prediseñada_ejercicios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     rutina_id INT NOT NULL,

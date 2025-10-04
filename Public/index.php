@@ -203,6 +203,22 @@ switch ($r) {
     require_login($BASE);
     vista(__DIR__ . '/../App/views/herramientas.php', ['BASE' => $BASE]);
     break;
+
+    // En index.php, añade este nuevo case
+
+case 'biblioteca':
+    require_login( $BASE);
+    require_once __DIR__ . '/../App/models/EjerciciosModelo.php';
+    
+    // Obtenemos todos los ejercicios, igual que antes
+    $ejercicios = EjerciciosModelo::obtenerTodos($mysqli);
+
+    // Mostramos la nueva vista
+    vista(__DIR__ . '/../App/views/bibliotecaEjercicios.php', [
+        'BASE' => $BASE,
+        'ejercicios' => $ejercicios
+    ]);
+    break;
   case 'guardar_imc':
     // Solo responde a peticiones POST y si el usuario está logueado
     if ($_SERVER['REQUEST_METHOD'] !== 'POST' || empty($_SESSION['user_id'])) {
