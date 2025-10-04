@@ -75,4 +75,24 @@ public static function eliminar(mysqli $db, int $userId): bool {
     // Ejecuta y devuelve true si fue exitoso
     return $stmt->execute();
 }
+// Guarda el token y su fecha de expiración en la base de datos
+// Esta es la versión corregida
+public static function guardarTokenReseteo(mysqli $db, int $userId, ?string $token, ?string $expires): bool {
+    // Si el token no es nulo, lo hasheamos. Si es nulo, guardamos null.
+    $hash = $token ? hash('sha256', $token) : null; 
+    
+    $stmt = $db->prepare('UPDATE users SET password_reset_token = ?, password_reset_expires = ? WHERE id = ?');
+    $stmt->bind_param('ssi', $hash, $expires, $userId);
+    return $stmt->execute();
+}
+
+// Busca a un usuario por un token válido y no expirado
+public static function buscarPorTokenReseteo(mysqli $db, string $token): ?array {
+    $hash = hash('sha256', $token);
+    $stmt = $db->prepare("SELECT * FROM users WHERE password_reset_token = ? AND password_reset_expires > NOW() LIMIT 1");
+    $stmt->bind_param('s', $hash);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    return $res->fetch_assoc() ?: null;
+}
 }

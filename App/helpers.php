@@ -1,4 +1,9 @@
 <?php
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
 // ---------------------------
 // Funciones helper globales
 // ---------------------------
@@ -37,36 +42,54 @@ function vista($ruta, array $data = []) {
     }
 }
 
-// --- FUNCIÓN require_login CORREGIDA Y SIMPLIFICADA ---
 function require_login(string $BASE) {
-    // 1. Verifica si hay un usuario logueado. Si no, lo manda a login.
     if (empty($_SESSION['user_id'])) {
         $next = $_SERVER['REQUEST_URI'] ?? ($BASE . 'index.php?r=inicio');
         flash('error','⚠️ Necesitas iniciar sesión para acceder a esta sección.');
         header('Location: ' . $BASE . 'index.php?r=login&next=' . urlencode($next));
         exit;
     }
-    
 
-    // 2. Verifica si el usuario ha llenado el cuestionario.
     $currentPage = $_GET['r'] ?? 'inicio';
-    // En helpers.php, dentro de la función require_login()
-
-if ($currentPage !== 'cuestionario' && $currentPage !== 'cuestionario_post' && $currentPage !== 'logout') {
-    
-    // --- ESTA ES LA LÍNEA QUE SOLUCIONA TODO ---
-    global $mysqli; 
-
-    require_once __DIR__ . '/models/UsuariosModelo.php';
-// ...
+    if ($currentPage !== 'cuestionario' && $currentPage !== 'cuestionario_post' && $currentPage !== 'logout') {
+        global $mysqli; 
+        require_once __DIR__ . '/models/UsuariosModelo.php';
         
         $usuario = Usuario::buscarPorId($mysqli, $_SESSION['user_id']);
 
-        // Si la columna 'nivel_actividad' está vacía, lo redirige al cuestionario
         if ($usuario && empty($usuario['nivel_actividad'])) {
             flash('info', 'Para continuar, por favor, cuéntanos sobre tus hábitos.');
             header('Location: ' . $BASE . 'index.php?r=cuestionario');
             exit;
         }
+    }
+}
+
+function enviarCorreoReseteo($correoDestino, $nombreDestino, $token, $BASE) {
+    $mail = new PHPMailer(true);
+    $resetLink = 'https://4d1f66636246.ngrok-free.app/ProyectoAutonomiaPersonal/Public/index.php?r=reset_password&token=' . $token;
+
+    try {
+        $mail->isSMTP();
+        $mail->Host       = 'smtp.gmail.com';
+        $mail->SMTPAuth   = true;
+        $mail->Username   = 'vitabalance194@gmail.com';
+        $mail->Password   = 'wuaw vsdm abai qskd';
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+        $mail->Port       = 465;
+        $mail->CharSet    = 'UTF-8';
+
+        $mail->setFrom('vitabalance194@gmail.com', 'VitaBalance App');
+        $mail->addAddress($correoDestino, $nombreDestino);
+
+        $mail->isHTML(true);
+        $mail->Subject = 'Recuperación de Contraseña - VitaBalance';
+        $mail->Body    = "Hola " . htmlspecialchars($nombreDestino) . ",<br><br>Has solicitado restablecer tu contraseña. Haz clic en el siguiente enlace para continuar:<br><br><a href='" . $resetLink . "' style='padding:10px 20px; background-color:#6d28d9; color:white; text-decoration:none; border-radius:5px;'>Restablecer mi Contraseña</a><br><br>Si no solicitaste esto, puedes ignorar este correo.";
+        $mail->AltBody = 'Para restablecer tu contraseña, copia y pega este enlace en tu navegador: ' . $resetLink;
+
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        return false;
     }
 }

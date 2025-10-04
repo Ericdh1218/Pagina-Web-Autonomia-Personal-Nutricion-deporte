@@ -30,7 +30,7 @@
         <div>
           <h4 class="text-lg font-semibold mb-4">Contacto</h4>
           <ul class="space-y-2 text-gray-400">
-            <li>📧 vitabalance@gmail.com</li>
+            <li>📧 vitabalance194@gmail.com</li>
             <li>📱 +52 2222175420</li>
             <li>🌐 www.vitabalance.com</li>
           </ul>

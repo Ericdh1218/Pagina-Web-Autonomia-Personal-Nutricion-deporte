@@ -426,6 +426,92 @@ switch ($r) {
     header('Location: ' . $BASE . 'index.php?r=inicio');
     exit;
 
+    // Ruta para MOSTRAR el formulario de "olvidé mi contraseña"
+case 'forgot_password':
+    vista(__DIR__ . '/../App/views/auth/forgot_password.php', ['BASE' => $BASE]);
+    break;
+
+// Ruta para PROCESAR el email y generar el token
+case 'forgot_password_post':
+    require_once __DIR__ . '/../App/models/UsuariosModelo.php';
+    $correo = $_POST['correo'] ?? '';
+    $user = Usuario::buscarPorCorreo($mysqli, $correo);
+
+    if ($user) {
+        // Generar un token seguro
+        $token = bin2hex(random_bytes(32));
+        $expires = date('Y-m-d H:i:s', time() + 3600); // Expira en 1 hora
+
+        Usuario::guardarTokenReseteo($mysqli, $user['id'], $token, $expires);
+
+        // --- SIMULACIÓN DE ENVÍO DE CORREO ---
+        // En una aplicación real, aquí enviarías un email al usuario.
+        // Para probar, mostraremos el enlace directamente en la pantalla.
+        $resetLink = $BASE . 'index.php?r=reset_password&token=' . $token;
+        flash('ok', 'Si el correo existe, se ha enviado un enlace. Para probar, haz clic aquí: <a href="' . $resetLink . '" class="font-bold underline">Restablecer Contraseña</a>');
+        
+    } else {
+        // Mostramos el mismo mensaje aunque el correo no exista para no dar pistas
+        flash('ok', 'Si el correo existe, se ha enviado un enlace de recuperación.');
+    }
+
+    header('Location: ' . $BASE . 'index.php?r=forgot_password');
+    exit;
+    // ... después de tu case 'forgot_password_post'
+
+// Ruta para MOSTRAR el formulario de restablecer contraseña
+case 'reset_password':
+    require_once __DIR__ . '/../App/models/UsuariosModelo.php';
+    $token = $_GET['token'] ?? '';
+    
+    // Verificar que el token sea válido y no haya expirado
+    $user = Usuario::buscarPorTokenReseteo($mysqli, $token);
+    if (!$user) {
+        flash('error', 'El enlace de recuperación no es válido o ha expirado. Por favor, solicita uno nuevo.');
+        header('Location: ' . $BASE . 'index.php?r=forgot_password');
+        exit;
+    }
+
+    // Muestra la vista para introducir la nueva contraseña
+    vista(__DIR__ . '/../App/views/auth/reset_password.php', [
+        'BASE' => $BASE,
+        'token' => $token // Pasamos el token a la vista
+    ]);
+    break;
+
+// Ruta para PROCESAR y GUARDAR la nueva contraseña
+case 'reset_password_post':
+    require_once __DIR__ . '/../App/models/UsuariosModelo.php';
+
+    $token = $_POST['token'] ?? '';
+    $pass = $_POST['password'] ?? '';
+    $pass2 = $_POST['password2'] ?? '';
+
+    // Validar el token de nuevo por seguridad
+    $user = Usuario::buscarPorTokenReseteo($mysqli, $token);
+    if (!$user) {
+        flash('error', 'Petición no válida o el token ha expirado.');
+        header('Location: ' . $BASE . 'index.php?r=forgot_password');
+        exit;
+    }
+
+    // Validar la nueva contraseña
+    if (strlen($pass) < 8 || $pass !== $pass2) {
+        flash('error', 'Las contraseñas no coinciden o tienen menos de 8 caracteres.');
+        header('Location: ' . $BASE . 'index.php?r=reset_password&token=' . urlencode($token));
+        exit;
+    }
+    
+    // Si todo es correcto, actualiza la contraseña y limpia el token
+    Usuario::actualizarPassword($mysqli, $user['id'], $pass);
+    Usuario::guardarTokenReseteo($mysqli, $user['id'], null, null);
+
+    flash('ok', '¡Tu contraseña ha sido restablecida! Ya puedes iniciar sesión.');
+    header('Location: ' . $BASE . 'index.php?r=login');
+    exit;
+
+// ... el resto de tus rutas
+
   case 'logout':
     session_destroy();
     header('Location: ' . $BASE . 'index.php?r=inicio');
