@@ -44,7 +44,6 @@ switch ($r) {
   case 'deporte':
     require_login($BASE);
 
-    // Cargar todos los modelos necesarios
     require_once __DIR__ . '/../App/models/EjerciciosModelo.php';
     require_once __DIR__ . '/../App/models/UsuariosModelo.php';
     require_once __DIR__ . '/../App/models/RutinasModelo.php';
@@ -54,21 +53,65 @@ switch ($r) {
     $usuario = Usuario::buscarPorId($mysqli, $_SESSION['user_id']);
     $nivelActividad = $usuario['nivel_actividad'] ?? 'sedentario';
 
-    // Pedir una rutina sugerida al modelo
+    // --- LÍNEA QUE FALTABA ---
+    // Pide la rutina sugerida (esta línea la habías borrado)
     $rutinaSugerida = RutinasModelo::sugerirRutina($mysqli, $nivelActividad);
 
+    // Pide TODAS las rutinas prediseñadas
+    $todasLasRutinas = RutinasModelo::obtenerTodasPrediseñadas($mysqli);
+
+    $misRutinas = RutinasModelo::obtenerRutinasPorUsuario($mysqli, $_SESSION['user_id']);
     // Enviar todos los datos a la vista
     vista(__DIR__ . '/../App/views/deporte.php', [
-      'BASE' => $BASE,
-      'ejercicios' => $ejercicios,
-      'rutinaSugerida' => $rutinaSugerida,
-      'nivelActual' => $nivelActividad
+        'BASE' => $BASE,
+        'ejercicios' => $ejercicios,
+        'rutinaSugerida' => $rutinaSugerida,
+        'nivelActual' => $nivelActividad,
+        'todasLasRutinas' => $todasLasRutinas,
+        'misRutinas' => $misRutinas // <-- NUEVO DATO
     ]);
     break;
 
-  // En index.php
 
-  // ... (después del 'case deporte')
+    case 'crear_rutina':
+    require_login($BASE);
+    require_once __DIR__ . '/../App/models/EjerciciosModelo.php';
+
+    // Obtenemos todos los ejercicios para mostrarlos en la lista
+    $ejercicios = EjerciciosModelo::obtenerTodos($mysqli);
+
+    vista(__DIR__ . '/../App/views/crear_rutina.php', [
+        'BASE' => $BASE,
+        'ejercicios' => $ejercicios
+    ]);
+    break;
+
+// Ruta para PROCESAR el formulario y GUARDAR la rutina
+case 'crear_rutina_post':
+    require_login($BASE);
+    require_once __DIR__ . '/../App/models/RutinasModelo.php';
+
+    $nombreRutina = $_POST['nombre_rutina'] ?? '';
+    $ejerciciosIds = $_POST['ejercicios'] ?? []; // Esto será un array
+
+    // Validación simple
+    if (empty($nombreRutina) || empty($ejerciciosIds)) {
+        flash('error', 'Debes darle un nombre a tu rutina y seleccionar al menos un ejercicio.');
+        header('Location: '. $BASE . 'index.php?r=crear_rutina');
+        exit;
+    }
+
+    // Usamos la función del modelo que ya creamos
+    $exito = RutinasModelo::crearRutina($mysqli, $_SESSION['user_id'], $nombreRutina, $ejerciciosIds);
+
+    if ($exito) {
+        flash('ok', '¡Tu rutina "' . e($nombreRutina) . '" ha sido guardada!');
+    } else {
+        flash('error', 'Hubo un error al guardar tu rutina.');
+    }
+
+    header('Location: '. $BASE . 'index.php?r=deporte');
+    exit;
 
   case 'ejercicio': // <-- NUEVA RUTA
     require_login($BASE);
