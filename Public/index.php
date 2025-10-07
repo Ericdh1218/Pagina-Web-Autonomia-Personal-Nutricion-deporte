@@ -31,15 +31,10 @@ switch ($r) {
     ]);
     break;
 
-  case 'ejercicios':
-    // Obtenemos todos los ejercicios de la base de datos
-    $ejercicios = $mysqli->query("SELECT * FROM ejercicios ORDER BY categoria, nombre")->fetch_all(MYSQLI_ASSOC);
-    // Mostramos la nueva vista 'ejercicios.php' y le pasamos los datos
-    vista(__DIR__ . '/../App/views/ejercicios.php', [
-      'BASE' => $BASE,
-      'ejercicios' => $ejercicios
-    ]);
-    break;
+case 'ejercicios':
+    // Redirigir permanentemente a la nueva y mejorada biblioteca de ejercicios
+    header('Location: ' . $BASE . 'index.php?r=biblioteca', true, 301);
+    exit;
 
   case 'deporte':
     require_login($BASE);
