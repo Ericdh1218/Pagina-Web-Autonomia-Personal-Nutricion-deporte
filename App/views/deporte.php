@@ -37,7 +37,8 @@
                         <?php foreach ($rutinaSugerida['ejercicios'] as $ejercicio): ?>
                             <div class="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
                                 <img src="<?= $BASE ?>assets/img/<?= e($ejercicio['media_url']) ?>" alt="<?= e($ejercicio['nombre']) ?>"
-                                     class="w-16 h-16 object-cover rounded-md border">
+                                     class="w-16 h-16 object-contain rounded-md border">
+                                     
                                 <div>
                                     <p class="font-semibold text-lg"><?= e($ejercicio['nombre']) ?></p>
                                     <p class="text-gray-500"><?= e($ejercicio['series_reps']) ?></p>

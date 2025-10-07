@@ -6,8 +6,20 @@
             Biblioteca de Ejercicios
         </h1>
         <p class="text-lg text-gray-600">Filtra y explora todos los movimientos disponibles para construir tu rutina.</p>
-        <a href="<?= $BASE ?>index.php?r=deporte" class="text-violet-600 hover:underline mt-4 inline-block">← Volver al Centro de Deporte</a>
+        <form method="get" action="<?= $BASE ?>index.php" class="max-w-xl mx-auto my-8 flex items-center">
+    <input type="hidden" name="r" value="biblioteca">
+    <input type="text" name="q" placeholder="Buscar ejercicio por nombre..." 
+           class="w-full px-4 py-3 border border-gray-300 rounded-l-lg focus:ring-violet-500 focus:border-violet-500 text-lg" 
+           value="<?= e($searchTerm ?? '') ?>">
+    <button type="submit" class="bg-violet-600 text-white px-6 py-3 rounded-r-lg hover:bg-violet-700">
+        Buscar
+    </button>
+</form>
+
+<a href="<?= $BASE ?>index.php?r=deporte" class="text-violet-600 hover:underline mt-4 inline-block">← Volver al Centro de Deporte</a>
     </div>
+
+    
 
     <div class="space-y-6 bg-white p-6 rounded-2xl shadow-lg border border-gray-100 mb-10">
         <div>
@@ -59,7 +71,7 @@
                  data-equipamiento="<?= e($ejercicio['equipamiento']) ?>">
                 <a href="<?= $BASE ?>index.php?r=ejercicio&id=<?= $ejercicio['id'] ?>">
                     <?php $imagePath = $BASE . 'assets/img/' . e($ejercicio['media_url'] ?? 'placeholder.jpg'); ?>
-                    <img src="<?= $imagePath ?>" alt="<?= e($ejercicio['nombre']) ?>" class="w-full h-40 object-cover">
+                    <img src="<?= $imagePath ?>" alt="<?= e($ejercicio['nombre']) ?>" class="w-full h-40 object-contain bg-gray-50">
                 </a>
                 <div class="p-4">
                     <span class="text-xs font-semibold uppercase text-violet-500"><?= e($ejercicio['grupo_muscular']) ?></span>

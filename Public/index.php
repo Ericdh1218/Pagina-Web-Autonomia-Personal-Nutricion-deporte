@@ -63,17 +63,17 @@ switch ($r) {
     $misRutinas = RutinasModelo::obtenerRutinasPorUsuario($mysqli, $_SESSION['user_id']);
     // Enviar todos los datos a la vista
     vista(__DIR__ . '/../App/views/deporte.php', [
-        'BASE' => $BASE,
-        'ejercicios' => $ejercicios,
-        'rutinaSugerida' => $rutinaSugerida,
-        'nivelActual' => $nivelActividad,
-        'todasLasRutinas' => $todasLasRutinas,
-        'misRutinas' => $misRutinas // <-- NUEVO DATO
+      'BASE' => $BASE,
+      'ejercicios' => $ejercicios,
+      'rutinaSugerida' => $rutinaSugerida,
+      'nivelActual' => $nivelActividad,
+      'todasLasRutinas' => $todasLasRutinas,
+      'misRutinas' => $misRutinas // <-- NUEVO DATO
     ]);
     break;
 
 
-    case 'crear_rutina':
+  case 'crear_rutina':
     require_login($BASE);
     require_once __DIR__ . '/../App/models/EjerciciosModelo.php';
 
@@ -81,13 +81,13 @@ switch ($r) {
     $ejercicios = EjerciciosModelo::obtenerTodos($mysqli);
 
     vista(__DIR__ . '/../App/views/crear_rutina.php', [
-        'BASE' => $BASE,
-        'ejercicios' => $ejercicios
+      'BASE' => $BASE,
+      'ejercicios' => $ejercicios
     ]);
     break;
 
-// Ruta para PROCESAR el formulario y GUARDAR la rutina
-case 'crear_rutina_post':
+  // Ruta para PROCESAR el formulario y GUARDAR la rutina
+  case 'crear_rutina_post':
     require_login($BASE);
     require_once __DIR__ . '/../App/models/RutinasModelo.php';
 
@@ -96,21 +96,21 @@ case 'crear_rutina_post':
 
     // Validación simple
     if (empty($nombreRutina) || empty($ejerciciosIds)) {
-        flash('error', 'Debes darle un nombre a tu rutina y seleccionar al menos un ejercicio.');
-        header('Location: '. $BASE . 'index.php?r=crear_rutina');
-        exit;
+      flash('error', 'Debes darle un nombre a tu rutina y seleccionar al menos un ejercicio.');
+      header('Location: ' . $BASE . 'index.php?r=crear_rutina');
+      exit;
     }
 
     // Usamos la función del modelo que ya creamos
     $exito = RutinasModelo::crearRutina($mysqli, $_SESSION['user_id'], $nombreRutina, $ejerciciosIds);
 
     if ($exito) {
-        flash('ok', '¡Tu rutina "' . e($nombreRutina) . '" ha sido guardada!');
+      flash('ok', '¡Tu rutina "' . e($nombreRutina) . '" ha sido guardada!');
     } else {
-        flash('error', 'Hubo un error al guardar tu rutina.');
+      flash('error', 'Hubo un error al guardar tu rutina.');
     }
 
-    header('Location: '. $BASE . 'index.php?r=deporte');
+    header('Location: ' . $BASE . 'index.php?r=deporte');
     exit;
 
   case 'ejercicio': // <-- NUEVA RUTA
@@ -238,6 +238,16 @@ case 'crear_rutina_post':
     // --- FIN DE LA MODIFICACIÓN ---
     break;
 
+  case 'editar_habitos':
+    require_login($BASE);
+    require_once __DIR__ . '/../App/models/UsuariosModelo.php';
+    $usuario = Usuario::buscarPorId($mysqli, $_SESSION['user_id']);
+    vista(__DIR__ . '/../App/views/editar_habitos.php', [
+      'BASE' => $BASE,
+      'usuario' => $usuario
+    ]);
+    break;
+
   case 'guias':
     vista(__DIR__ . '/../App/views/guias.php', ['BASE' => $BASE]);
     break;
@@ -247,21 +257,27 @@ case 'crear_rutina_post':
     vista(__DIR__ . '/../App/views/herramientas.php', ['BASE' => $BASE]);
     break;
 
-    // En index.php, añade este nuevo case
+  // En index.php, añade este nuevo case
 
-case 'biblioteca':
-    require_login( $BASE);
+  case 'biblioteca':
+    require_login($BASE);
     require_once __DIR__ . '/../App/models/EjerciciosModelo.php';
     
-    // Obtenemos todos los ejercicios, igual que antes
-    $ejercicios = EjerciciosModelo::obtenerTodos($mysqli);
+    // 1. Obtener el término de búsqueda de la URL
+    $q = $_GET['q'] ?? null;
+    
+    // 2. Pasar el término de búsqueda al modelo
+    $ejercicios = EjerciciosModelo::obtenerTodos($mysqli, $q);
 
-    // Mostramos la nueva vista
+    // 3. Pasar los ejercicios Y el término de búsqueda a la vista
     vista(__DIR__ . '/../App/views/bibliotecaEjercicios.php', [
         'BASE' => $BASE,
-        'ejercicios' => $ejercicios
+        'ejercicios' => $ejercicios,
+        'searchTerm' => $q // Para que el campo de búsqueda recuerde el texto
     ]);
     break;
+
+
   case 'guardar_imc':
     // Solo responde a peticiones POST y si el usuario está logueado
     if ($_SERVER['REQUEST_METHOD'] !== 'POST' || empty($_SESSION['user_id'])) {
@@ -470,9 +486,9 @@ case 'biblioteca':
     // 2. Verificar la contraseña por seguridad
     $usuario = Usuario::buscarPorId($mysqli, $userId);
     if (!$usuario || !password_verify($password, $usuario['password_hash'])) {
-        flash('error', 'La contraseña es incorrecta. No se pudo eliminar la cuenta.');
-        header('Location: ' . $BASE . 'index.php?r=Micuenta');
-        exit;
+      flash('error', 'La contraseña es incorrecta. No se pudo eliminar la cuenta.');
+      header('Location: ' . $BASE . 'index.php?r=Micuenta');
+      exit;
     }
 
     // 3. Si la contraseña es correcta, eliminar la cuenta
@@ -485,61 +501,61 @@ case 'biblioteca':
     header('Location: ' . $BASE . 'index.php?r=inicio');
     exit;
 
-    // Ruta para MOSTRAR el formulario de "olvidé mi contraseña"
-case 'forgot_password':
+  // Ruta para MOSTRAR el formulario de "olvidé mi contraseña"
+  case 'forgot_password':
     vista(__DIR__ . '/../App/views/auth/forgot_password.php', ['BASE' => $BASE]);
     break;
 
-// Ruta para PROCESAR el email y generar el token
-case 'forgot_password_post':
+  // Ruta para PROCESAR el email y generar el token
+  case 'forgot_password_post':
     require_once __DIR__ . '/../App/models/UsuariosModelo.php';
     $correo = $_POST['correo'] ?? '';
     $user = Usuario::buscarPorCorreo($mysqli, $correo);
 
     if ($user) {
-        // Generar un token seguro
-        $token = bin2hex(random_bytes(32));
-        $expires = date('Y-m-d H:i:s', time() + 3600); // Expira en 1 hora
+      // Generar un token seguro
+      $token = bin2hex(random_bytes(32));
+      $expires = date('Y-m-d H:i:s', time() + 3600); // Expira en 1 hora
 
-        Usuario::guardarTokenReseteo($mysqli, $user['id'], $token, $expires);
+      Usuario::guardarTokenReseteo($mysqli, $user['id'], $token, $expires);
 
-        // --- SIMULACIÓN DE ENVÍO DE CORREO ---
-        // En una aplicación real, aquí enviarías un email al usuario.
-        // Para probar, mostraremos el enlace directamente en la pantalla.
-        $resetLink = $BASE . 'index.php?r=reset_password&token=' . $token;
-        flash('ok', 'Si el correo existe, se ha enviado un enlace. Para probar, haz clic aquí: <a href="' . $resetLink . '" class="font-bold underline">Restablecer Contraseña</a>');
-        
+      // --- SIMULACIÓN DE ENVÍO DE CORREO ---
+      // En una aplicación real, aquí enviarías un email al usuario.
+      // Para probar, mostraremos el enlace directamente en la pantalla.
+      $resetLink = $BASE . 'index.php?r=reset_password&token=' . $token;
+      flash('ok', 'Si el correo existe, se ha enviado un enlace. Para probar, haz clic aquí: <a href="' . $resetLink . '" class="font-bold underline">Restablecer Contraseña</a>');
+
     } else {
-        // Mostramos el mismo mensaje aunque el correo no exista para no dar pistas
-        flash('ok', 'Si el correo existe, se ha enviado un enlace de recuperación.');
+      // Mostramos el mismo mensaje aunque el correo no exista para no dar pistas
+      flash('ok', 'Si el correo existe, se ha enviado un enlace de recuperación.');
     }
 
     header('Location: ' . $BASE . 'index.php?r=forgot_password');
     exit;
-    // ... después de tu case 'forgot_password_post'
+  // ... después de tu case 'forgot_password_post'
 
-// Ruta para MOSTRAR el formulario de restablecer contraseña
-case 'reset_password':
+  // Ruta para MOSTRAR el formulario de restablecer contraseña
+  case 'reset_password':
     require_once __DIR__ . '/../App/models/UsuariosModelo.php';
     $token = $_GET['token'] ?? '';
-    
+
     // Verificar que el token sea válido y no haya expirado
     $user = Usuario::buscarPorTokenReseteo($mysqli, $token);
     if (!$user) {
-        flash('error', 'El enlace de recuperación no es válido o ha expirado. Por favor, solicita uno nuevo.');
-        header('Location: ' . $BASE . 'index.php?r=forgot_password');
-        exit;
+      flash('error', 'El enlace de recuperación no es válido o ha expirado. Por favor, solicita uno nuevo.');
+      header('Location: ' . $BASE . 'index.php?r=forgot_password');
+      exit;
     }
 
     // Muestra la vista para introducir la nueva contraseña
     vista(__DIR__ . '/../App/views/auth/reset_password.php', [
-        'BASE' => $BASE,
-        'token' => $token // Pasamos el token a la vista
+      'BASE' => $BASE,
+      'token' => $token // Pasamos el token a la vista
     ]);
     break;
 
-// Ruta para PROCESAR y GUARDAR la nueva contraseña
-case 'reset_password_post':
+  // Ruta para PROCESAR y GUARDAR la nueva contraseña
+  case 'reset_password_post':
     require_once __DIR__ . '/../App/models/UsuariosModelo.php';
 
     $token = $_POST['token'] ?? '';
@@ -549,18 +565,18 @@ case 'reset_password_post':
     // Validar el token de nuevo por seguridad
     $user = Usuario::buscarPorTokenReseteo($mysqli, $token);
     if (!$user) {
-        flash('error', 'Petición no válida o el token ha expirado.');
-        header('Location: ' . $BASE . 'index.php?r=forgot_password');
-        exit;
+      flash('error', 'Petición no válida o el token ha expirado.');
+      header('Location: ' . $BASE . 'index.php?r=forgot_password');
+      exit;
     }
 
     // Validar la nueva contraseña
     if (strlen($pass) < 8 || $pass !== $pass2) {
-        flash('error', 'Las contraseñas no coinciden o tienen menos de 8 caracteres.');
-        header('Location: ' . $BASE . 'index.php?r=reset_password&token=' . urlencode($token));
-        exit;
+      flash('error', 'Las contraseñas no coinciden o tienen menos de 8 caracteres.');
+      header('Location: ' . $BASE . 'index.php?r=reset_password&token=' . urlencode($token));
+      exit;
     }
-    
+
     // Si todo es correcto, actualiza la contraseña y limpia el token
     Usuario::actualizarPassword($mysqli, $user['id'], $pass);
     Usuario::guardarTokenReseteo($mysqli, $user['id'], null, null);
@@ -569,7 +585,7 @@ case 'reset_password_post':
     header('Location: ' . $BASE . 'index.php?r=login');
     exit;
 
-// ... el resto de tus rutas
+  // ... el resto de tus rutas
 
   case 'logout':
     session_destroy();

@@ -1,7 +1,7 @@
 <div class="container mx-auto px-6 py-12">
     <div class="max-w-5xl mx-auto">
 
-        <a href="<?= $BASE ?>index.php?r=deporte" class="text-violet-600 hover:underline mb-6 inline-block">← Volver a la biblioteca</a>
+        <a href="<?= $BASE ?>index.php?r=biblioteca" class="text-violet-600 hover:underline mb-6 inline-block">← Volver a la biblioteca</a>
 
         <div class="bg-white p-8 rounded-2xl shadow-xl">
             <h1 class="text-4xl font-bold text-gray-800 mb-4"><?= e($ejercicio['nombre']) ?></h1>
