@@ -24,7 +24,7 @@
     const BASE = '<?= $BASE ?>'; // Añade esta línea
 </script>
 
-<script src="<?= $BASE ?>assets/js/main.js?v=1.2"></script> <!-- Aumenta la versión para evitar caché -->
+<script src="<?= $BASE ?>assets/js/main.js?v=1.3"></script> <!-- Aumenta la versión para evitar caché -->
 
 </body>
 </html>

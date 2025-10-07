@@ -31,7 +31,7 @@ switch ($r) {
     ]);
     break;
 
-case 'ejercicios':
+  case 'ejercicios':
     // Redirigir permanentemente a la nueva y mejorada biblioteca de ejercicios
     header('Location: ' . $BASE . 'index.php?r=biblioteca', true, 301);
     exit;
@@ -247,28 +247,94 @@ case 'ejercicios':
     vista(__DIR__ . '/../App/views/guias.php', ['BASE' => $BASE]);
     break;
 
+  // En index.php
+// En index.php, modifica el case 'herramientas'
   case 'herramientas':
     require_login($BASE);
-    vista(__DIR__ . '/../App/views/herramientas.php', ['BASE' => $BASE]);
-    break;
+    require_once __DIR__ . '/../App/models/EjerciciosModelo.php';
+    require_once __DIR__ . '/../App/models/UsuariosModelo.php';
+    require_once __DIR__ . '/../App/models/HabitosModelo.php';
+    require_once __DIR__ . '/../App/models/MedidasModelo.php';
 
+    $ejercicios = EjerciciosModelo::obtenerTodos($mysqli);
+    $usuario = Usuario::buscarPorId($mysqli, $_SESSION['user_id']);
+
+
+    // Obtener los hábitos de hoy
+    $fechaHoy = date('Y-m-d');
+    $habitosHoy = HabitosModelo::obtenerRegistroPorFecha($mysqli, $_SESSION['user_id'], $fechaHoy);
+
+    $historialMedidas = MedidasModelo::obtenerHistorial($mysqli, $_SESSION['user_id']);
+
+    vista(__DIR__ . '/../App/views/herramientas.php', [
+      'BASE' => $BASE,
+      'ejercicios' => $ejercicios,
+      'usuario' => $usuario, // Pasamos el usuario para obtener las metas
+      'habitosHoy' => $habitosHoy, // Pasamos los hábitos de hoy
+      'historialMedidas' => $historialMedidas,
+    ]);
+    break;
+  case 'guardar_medidas':
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST' || empty($_SESSION['user_id'])) {
+      exit;
+    }
+
+    require_once __DIR__ . '/../App/models/MedidasModelo.php';
+
+    $data = json_decode(file_get_contents('php://input'), true);
+    $fecha = $data['fecha'] ?? date('Y-m-d');
+    $medidas = [
+      'peso' => !empty($data['peso']) ? (float) $data['peso'] : null,
+      'cintura' => !empty($data['cintura']) ? (float) $data['cintura'] : null,
+      'cadera' => !empty($data['cadera']) ? (float) $data['cadera'] : null,
+      'pecho' => !empty($data['pecho']) ? (float) $data['pecho'] : null,
+    ];
+
+    $exito = MedidasModelo::guardarMedidas($mysqli, $_SESSION['user_id'], $fecha, $medidas);
+
+    header('Content-Type: application/json');
+    echo json_encode(['status' => $exito ? 'ok' : 'error']);
+    exit;
+
+  // Añade este nuevo case
+  case 'guardar_habitos':
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST' || empty($_SESSION['user_id'])) {
+      exit;
+    }
+
+    require_once __DIR__ . '/../App/models/HabitosModelo.php';
+
+    $data = json_decode(file_get_contents('php://input'), true);
+    $fecha = $data['fecha'] ?? date('Y-m-d');
+    $habitos = [
+      'agua' => !empty($data['agua']) ? 1 : 0,
+      'sueno' => !empty($data['sueno']) ? 1 : 0,
+      'entrenamiento' => !empty($data['entrenamiento']) ? 1 : 0,
+      'alimentacion' => !empty($data['alimentacion']) ? 1 : 0
+    ];
+
+    $exito = HabitosModelo::guardarRegistro($mysqli, $_SESSION['user_id'], $fecha, $habitos);
+
+    header('Content-Type: application/json');
+    echo json_encode(['status' => $exito ? 'ok' : 'error']);
+    exit;
   // En index.php, añade este nuevo case
 
   case 'biblioteca':
     require_login($BASE);
     require_once __DIR__ . '/../App/models/EjerciciosModelo.php';
-    
+
     // 1. Obtener el término de búsqueda de la URL
     $q = $_GET['q'] ?? null;
-    
+
     // 2. Pasar el término de búsqueda al modelo
     $ejercicios = EjerciciosModelo::obtenerTodos($mysqli, $q);
 
     // 3. Pasar los ejercicios Y el término de búsqueda a la vista
     vista(__DIR__ . '/../App/views/bibliotecaEjercicios.php', [
-        'BASE' => $BASE,
-        'ejercicios' => $ejercicios,
-        'searchTerm' => $q // Para que el campo de búsqueda recuerde el texto
+      'BASE' => $BASE,
+      'ejercicios' => $ejercicios,
+      'searchTerm' => $q // Para que el campo de búsqueda recuerde el texto
     ]);
     break;
 

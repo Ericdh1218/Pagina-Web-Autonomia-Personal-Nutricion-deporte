@@ -10,16 +10,18 @@
         <h2 class="text-2xl font-bold mb-2">🎯 Ver mi Rutina Sugerida</h2>
         <p class="opacity-90">Un plan diseñado para tu nivel actual.</p>
     </button>
-    <button onclick="toggleSection('mis-rutinas')" class="text-left bg-blue-600 text-white p-8 rounded-2xl shadow-lg hover:bg-blue-700 transition-transform transform hover:scale-105">
+
+    <button onclick="toggleSection('mis-rutinas')" class="text-left bg-gray-800 text-white p-8 rounded-2xl shadow-lg hover:bg-gray-900 transition-transform transform hover:scale-105">
         <h2 class="text-2xl font-bold mb-2">📋 Mis Rutinas Guardadas</h2>
         <p class="opacity-90">Accede a los entrenamientos que tú creaste.</p>
     </button>
 
-    <a href="<?= $BASE ?>index.php?r=crear_rutina" class="block text-left bg-green-600 text-white p-8 rounded-2xl shadow-lg hover:bg-green-700 transition-transform transform hover:scale-105">
+    <a href="<?= $BASE ?>index.php?r=crear_rutina" class="block text-left bg-teal-500 text-white p-8 rounded-2xl shadow-lg hover:bg-teal-600 transition-transform transform hover:scale-105">
         <h2 class="text-2xl font-bold mb-2">✍️ Crear mi Propia Rutina</h2>
         <p class="opacity-90">Conviértete en tu propio entrenador.</p>
     </a>
-    <a href="<?= $BASE ?>index.php?r=biblioteca" class="block text-left bg-gray-800 text-white p-8 rounded-2xl shadow-lg hover:bg-gray-900 transition-transform transform hover:scale-105">
+
+    <a href="<?= $BASE ?>index.php?r=biblioteca" class="block text-left bg-gray-200 text-gray-800 p-8 rounded-2xl shadow-lg hover:bg-gray-300 transition-transform transform hover:scale-105">
         <h2 class="text-2xl font-bold mb-2">📚 Explorar Biblioteca</h2>
         <p class="opacity-90">Busca y aprende nuevos ejercicios.</p>
     </a>
